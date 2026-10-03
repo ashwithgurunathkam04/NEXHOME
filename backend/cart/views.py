@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from products.models import Product
 
 from .models import Cart, CartItem
-from .serializers import CartSerializer
+from .serializers import CartItemSerializer, CartSerializer
 
 
 class CartView(generics.RetrieveAPIView):
@@ -15,6 +15,8 @@ class CartView(generics.RetrieveAPIView):
 
     def get_object(self):
         cart, created = Cart.objects.get_or_create(user=self.request.user)
+
+        cart = Cart.objects.prefetch_related("items__product__category").get(id=cart.id)
 
         return cart
 
@@ -86,7 +88,55 @@ class AddToCartView(generics.GenericAPIView):
             cart_item.quantity = new_quantity
             cart_item.save()
 
+        cart = Cart.objects.prefetch_related("items__product__category").get(id=cart.id)
+
+        return Response(CartSerializer(cart).data, status=200)
+
+
+class CartItemUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CartItemSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["patch"]
+
+    def get_queryset(self):
+        return CartItem.objects.filter(cart__user=self.request.user)
+
+    def partial_update(self, request, *args, **kwargs):
+        cart_item = self.get_object()
+
+        quantity = request.data.get("quantity")
+
+        try:
+            quantity = int(quantity)
+        except (TypeError, ValueError):
+            return Response(
+                {"error": "quantity must be a number."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if quantity <= 0:
+            return Response(
+                {"error": "quantity must be greater than 0."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if quantity > cart_item.product.stock:
+            return Response(
+                {"error": "Not enough stock available."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        cart_item.quantity = quantity
+        cart_item.save()
+
         return Response(
-            CartSerializer(cart).data,
+            CartItemSerializer(cart_item).data,
             status=status.HTTP_200_OK,
         )
+
+
+class CartItemDeleteView(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return CartItem.objects.filter(cart__user=self.request.user)
