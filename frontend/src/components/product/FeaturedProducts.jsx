@@ -1,41 +1,50 @@
 import { Link } from 'react-router-dom'
+
 import products from '@/data/products'
 import ProductCard from '@/components/product/ProductCard'
 
 function FeaturedProducts() {
+  const featuredProducts = products
+    .filter((product) => product.rating >= 4.5)
+    .slice(0, 8)
+
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-      <div className="mb-12 flex items-end justify-between gap-6">
-        <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-accent">
-            Featured
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
+            Featured Collection
           </p>
 
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
             Popular products
           </h2>
 
-          <p className="mt-4 text-base leading-7 text-text-secondary">
-            Discover some of the products customers are looking at right now.
+          <p className="mt-3 max-w-2xl text-base leading-7 text-text-secondary">
+            Explore some of the highest-rated products available at NEXHOME.
           </p>
         </div>
 
         <Link
           to="/products"
-          className="hidden shrink-0 text-sm font-semibold text-brand-accent transition-colors hover:text-brand-accent-dark sm:block"
+          className="inline-flex w-fit items-center rounded-lg bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
         >
-          View all products →
+          View all products
         </Link>
+
       </div>
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
+      <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {featuredProducts.map((product) => (
           <ProductCard
             key={product.id}
             product={product}
           />
         ))}
       </div>
+
     </section>
   )
 }
