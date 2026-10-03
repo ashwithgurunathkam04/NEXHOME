@@ -1,88 +1,279 @@
 import { Link } from 'react-router-dom'
 
 function Account() {
-    return (
-        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
 
-            <div className="mx-auto max-w-3xl">
+      {/* Page header */}
 
-                <div className="text-center">
+      <div className="border-b border-border-strong pb-8">
 
-                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
-                        My Account
-                    </p>
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
+          My Account
+        </p>
 
-                    <h1 className="mt-3 text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl">
-                        Welcome to NEXHOME
-                    </h1>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
+          Account Dashboard
+        </h1>
 
-                    <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-text-secondary">
-                        Sign in to manage your orders, wishlist, saved details, and
-                        account preferences.
-                    </p>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-text-secondary">
+          Manage your orders, wishlist, account details, and shopping
+          preferences from one place.
+        </p>
+
+      </div>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
+
+        {/* Account navigation */}
+
+        <aside className="h-fit overflow-hidden rounded-2xl border-2 border-brand-accent bg-brand-dark p-3 shadow-sm">
+
+          <div className="border-b border-white/10 px-4 py-4">
+
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
+              Account Menu
+            </p>
+
+          </div>
+
+          <nav className="mt-2 space-y-1">
+
+            <Link
+              to="/account"
+              className="flex items-center justify-between rounded-lg bg-brand-accent px-4 py-3 text-sm font-semibold text-white"
+            >
+              <span>Account Overview</span>
+              <span>→</span>
+            </Link>
+
+            <Link
+              to="/orders"
+              className="flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <span>My Orders</span>
+              <span>→</span>
+            </Link>
+
+            <Link
+              to="/wishlist"
+              className="flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <span>Wishlist</span>
+              <span>→</span>
+            </Link>
+
+            <Link
+              to="/account/details"
+              className="flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <span>Account Details</span>
+              <span>→</span>
+            </Link>
+
+            <button
+              type="button"
+              className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-medium text-brand-accent transition-colors hover:bg-brand-accent/10"
+            >
+              <span>Sign Out</span>
+              <span>→</span>
+            </button>
+
+          </nav>
+
+        </aside>
+
+        {/* Dashboard */}
+
+        <div className="space-y-6">
+
+          {/* Welcome panel */}
+
+          <div className="rounded-2xl border-2 border-brand-accent bg-brand-dark p-7 text-white shadow-sm sm:p-8">
+
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand-accent">
+              Welcome back
+            </p>
+
+            <h2 className="mt-3 text-2xl font-semibold sm:text-3xl">
+              Your NEXHOME account
+            </h2>
+
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/60">
+              Keep track of your purchases, save products you like, and
+              manage your account information from one place.
+            </p>
+
+          </div>
+
+          {/* Quick actions */}
+
+          <div className="grid gap-5 sm:grid-cols-2">
+
+            <Link
+              to="/orders"
+              className="group rounded-2xl border-2 border-brand-accent bg-[#263238] p-6 text-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-brand-dark hover:shadow-lg"
+            >
+
+              <div className="flex items-start justify-between gap-4">
+
+                <div>
+
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
+                    Purchases
+                  </p>
+
+                  <h3 className="mt-2 text-xl font-semibold">
+                    My Orders
+                  </h3>
+
+                  <p className="mt-2 text-sm leading-6 text-white/55">
+                    View your orders, payment status, and delivery information.
+                  </p>
 
                 </div>
 
-                <div className="mt-10 grid gap-6 sm:grid-cols-2">
+                <span className="text-lg text-brand-accent transition-transform group-hover:translate-x-1">
+                  →
+                </span>
 
-                    {/* Login */}
+              </div>
 
-                    <div className="rounded-2xl border border-border bg-white p-7 shadow-sm">
+            </Link>
 
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-dark text-lg font-bold text-white">
-                            →
-                        </div>
+            <Link
+              to="/wishlist"
+              className="group rounded-2xl border-2 border-brand-accent bg-[#263238] p-6 text-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:bg-brand-dark hover:shadow-lg"
+            >
 
-                        <h2 className="mt-6 text-xl font-semibold text-text-primary">
-                            Already have an account?
-                        </h2>
+              <div className="flex items-start justify-between gap-4">
 
-                        <p className="mt-2 text-sm leading-6 text-text-secondary">
-                            Sign in to access your NEXHOME account and manage your
-                            purchases.
-                        </p>
+                <div>
 
-                        <Link
-                            to="/login"
-                            className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-brand-accent px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
-                        >
-                            Sign In
-                        </Link>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
+                    Saved Products
+                  </p>
 
-                    </div>
+                  <h3 className="mt-2 text-xl font-semibold">
+                    Wishlist
+                  </h3>
 
-                    {/* Register */}
-
-                    <div className="rounded-2xl border border-border bg-white p-7 shadow-sm">
-
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-accent text-lg font-bold text-white">
-                            +
-                        </div>
-
-                        <h2 className="mt-6 text-xl font-semibold text-text-primary">
-                            New to NEXHOME?
-                        </h2>
-
-                        <p className="mt-2 text-sm leading-6 text-text-secondary">
-                            Create an account to save your details and make future
-                            purchases easier.
-                        </p>
-
-                        <Link
-                            to="/register"
-                            className="mt-6 inline-flex w-full items-center justify-center rounded-lg border border-border-strong bg-white px-5 py-3.5 text-sm font-semibold text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
-                        >
-                            Create Account
-                        </Link>
-
-                    </div>
+                  <p className="mt-2 text-sm leading-6 text-white/55">
+                    Quickly access products you've saved for later.
+                  </p>
 
                 </div>
+
+                <span className="text-lg text-brand-accent transition-transform group-hover:translate-x-1">
+                  →
+                </span>
+
+              </div>
+
+            </Link>
+
+          </div>
+
+          {/* Account information */}
+
+          <div className="rounded-2xl border-2 border-brand-accent bg-brand-dark p-6 text-white shadow-sm sm:p-7">
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+              <div>
+
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
+                  Personal Information
+                </p>
+
+                <h2 className="mt-2 text-xl font-semibold">
+                  Account details
+                </h2>
+
+              </div>
+
+              <Link
+                to="/account/details"
+                className="w-fit rounded-lg border border-brand-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent hover:text-white"
+              >
+                Edit Details
+              </Link>
 
             </div>
 
-        </section>
-    )
+            <div className="mt-6 grid gap-5 border-t border-white/10 pt-6 sm:grid-cols-2">
+
+              <div>
+
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/40">
+                  Name
+                </p>
+
+                <p className="mt-2 text-sm font-medium text-white">
+                  Guest User
+                </p>
+
+              </div>
+
+              <div>
+
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/40">
+                  Email
+                </p>
+
+                <p className="mt-2 text-sm font-medium text-white">
+                  Not signed in
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* Authentication */}
+
+          <div className="rounded-2xl border border-border-strong bg-surface-soft p-6 sm:p-7">
+
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
+              Account Access
+            </p>
+
+            <h2 className="mt-2 text-xl font-semibold text-text-primary">
+              Not signed in?
+            </h2>
+
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary">
+              Sign in to access your personal account information and order
+              history.
+            </p>
+
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+
+              <Link
+                to="/login"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
+              >
+                Sign In
+              </Link>
+
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center rounded-lg border border-border-strong bg-white px-5 py-3 text-sm font-semibold text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
+              >
+                Create Account
+              </Link>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+  )
 }
 
 export default Account

@@ -4,25 +4,31 @@ function CategoryCard({ category }) {
   return (
     <Link
       to={`/products?category=${category.id}`}
-      className="group block rounded-2xl border border-border bg-white p-6 transition-all duration-200 hover:-translate-y-1 hover:border-brand-accent hover:shadow-lg"
+      className="group block h-full"
     >
-      <div className="flex items-start justify-between gap-5">
+      <article className="relative flex h-full min-h-[190px] flex-col justify-between overflow-hidden rounded-2xl border-2 border-brand-accent bg-brand-dark p-7 text-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-[#263238] hover:shadow-xl">
 
-        <div>
-          <h3 className="text-lg font-semibold text-text-primary transition-colors group-hover:text-brand-accent">
+        {/* Content */}
+
+        <div className="pr-14">
+
+          <h3 className="text-xl font-semibold leading-7 text-white">
             {category.name}
           </h3>
 
-          <p className="mt-2 text-sm leading-6 text-text-secondary">
+          <p className="mt-4 text-sm leading-6 text-white/65">
             {category.description}
           </p>
+
         </div>
 
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-lg text-text-secondary transition-all group-hover:border-brand-accent group-hover:bg-brand-accent group-hover:text-white">
+        {/* Arrow */}
+
+        <span className="absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full border border-brand-accent bg-transparent text-xl text-brand-accent transition-all duration-300 group-hover:bg-brand-accent group-hover:text-white">
           →
         </span>
 
-      </div>
+      </article>
     </Link>
   )
 }

@@ -1,15 +1,29 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 
+const productImages = {
+  1: 'https://www.lg.com/content/dam/channel/wcms/in/images/split-ac/us-q19snze/gallery/US-Q19SNZE-MZ-02.jpg',
+
+  2: 'https://media.karousell.com/media/photos/products/2024/12/10/samsung_inverter_split_type_ai_1733838895_e89e1911_progressive.jpg',
+
+  3: 'https://jesaelectronics.com/common/images/products/gallery/144215320.jpg',
+
+  4: 'https://vasanthandco.in/UploadedFiles/productimages/20250326110317-Untitled-1.png',
+}
+
+const fallbackImage =
+  'https://www.lg.com/content/dam/channel/wcms/in/images/split-ac/us-q19snze/gallery/US-Q19SNZE-MZ-02.jpg'
+
 function ProductCard({ product }) {
   const { addToCart } = useCart()
+  const { isInWishlist, toggleWishlist } = useWishlist()
 
-  const {
-    isInWishlist,
-    toggleWishlist,
-  } = useWishlist()
+  const [imageSrc, setImageSrc] = useState(
+    productImages[product.id] || product.image || fallbackImage,
+  )
 
   const discount = Math.round(
     ((product.originalPrice - product.price) /
@@ -17,8 +31,7 @@ function ProductCard({ product }) {
       100,
   )
 
-  const productInWishlist =
-    isInWishlist(product.id)
+  const productInWishlist = isInWishlist(product.id)
 
   const handleAddToCart = () => {
     addToCart(product)
@@ -31,16 +44,34 @@ function ProductCard({ product }) {
     toggleWishlist(product)
   }
 
+  const handleImageError = () => {
+    if (imageSrc !== fallbackImage) {
+      setImageSrc(fallbackImage)
+    }
+  }
+
   return (
     <article className="group overflow-hidden rounded-2xl border-2 border-brand-accent bg-[#263238] text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
 
       <Link to={`/products/${product.id}`}>
 
-        <div className="relative flex h-72 items-center justify-center overflow-hidden bg-[#f5f2ec]">
+        {/* Product Image */}
+
+        <div
+          className="relative flex h-72 items-center justify-center overflow-hidden"
+          style={{
+            backgroundColor:
+              product.imageBackground || '#f5f2ec',
+          }}
+        >
+
+          {/* Discount */}
 
           <span className="absolute left-5 top-5 z-20 rounded-md bg-brand-accent px-3 py-1.5 text-xs font-bold text-white shadow-sm">
             {discount}% OFF
           </span>
+
+          {/* Wishlist */}
 
           <button
             type="button"
@@ -59,15 +90,19 @@ function ProductCard({ product }) {
             {productInWishlist ? '♥' : '♡'}
           </button>
 
-          <div className="flex h-full w-full items-center justify-center px-8 text-center">
+          {/* Actual Product Image */}
 
-            <p className="max-w-xs text-sm font-medium text-text-secondary">
-              Product image will be added later
-            </p>
-
-          </div>
+          <img
+            src={imageSrc}
+            alt={product.name}
+            loading="lazy"
+            onError={handleImageError}
+            className="h-full w-full object-contain p-8 transition-transform duration-500 group-hover:scale-105"
+          />
 
         </div>
+
+        {/* Product Information */}
 
         <div className="p-6">
 
@@ -106,6 +141,8 @@ function ProductCard({ product }) {
         </div>
 
       </Link>
+
+      {/* Add To Cart */}
 
       <div className="px-6 pb-6">
 

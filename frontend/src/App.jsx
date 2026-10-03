@@ -8,12 +8,14 @@ import ProductDetails from '@/pages/ProductDetails'
 import Cart from '@/pages/Cart'
 import Wishlist from '@/pages/Wishlist'
 import Account from '@/pages/Account'
+import AccountDetails from '@/pages/AccountDetails'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import Checkout from '@/pages/Checkout'
 import Payment from '@/pages/Payment'
 import OrderSuccess from '@/pages/OrderSuccess'
 import Orders from '@/pages/Orders'
+import OrderDetails from '@/pages/OrderDetails'
 
 function App() {
   return (
@@ -53,6 +55,11 @@ function App() {
           />
 
           <Route
+            path="/account/details"
+            element={<AccountDetails />}
+          />
+
+          <Route
             path="/login"
             element={<Login />}
           />
@@ -80,6 +87,11 @@ function App() {
           <Route
             path="/orders"
             element={<Orders />}
+          />
+
+          <Route
+            path="/orders/:id"
+            element={<OrderDetails />}
           />
 
         </Route>

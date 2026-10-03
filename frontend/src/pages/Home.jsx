@@ -15,6 +15,8 @@ function Home() {
 
           <div className="grid min-h-[520px] grid-cols-1 lg:grid-cols-2">
 
+            {/* Hero Content */}
+
             <div className="flex flex-col justify-center px-7 py-12 sm:px-10 lg:px-14 lg:py-16">
 
               <div className="max-w-2xl">
@@ -28,8 +30,9 @@ function Home() {
                 </h1>
 
                 <p className="mt-7 max-w-xl text-base leading-7 text-white/65 sm:text-lg">
-                  Discover appliances, electronics, entertainment, technology,
-                  gaming, and everyday essentials for modern living.
+                  Discover appliances, electronics, entertainment,
+                  technology, gaming, and everyday essentials for modern
+                  living.
                 </p>
 
                 <div className="mt-9 flex flex-wrap gap-4">
@@ -54,25 +57,15 @@ function Home() {
 
             </div>
 
-            <div className="relative min-h-[320px] overflow-hidden bg-white lg:min-h-full">
+            {/* Hall + TV Image */}
+
+            <div className="relative min-h-[320px] overflow-hidden bg-[#e9e5dd] lg:min-h-full">
 
               <img
-                src="/hero-appliances.png"
-                alt="Modern home appliances"
-                className="h-full w-full object-contain transition-transform duration-700 hover:scale-105"
+                src="https://images.unsplash.com/photo-1631048501813-f9eda5b0b527?auto=format&fit=crop&w=1800&q=90"
+                alt="Modern living room with television"
+                className="h-full w-full object-cover object-center transition-transform duration-700 hover:scale-105"
               />
-
-              <div className="absolute bottom-6 left-6 rounded-xl border border-brand-accent bg-brand-dark/95 px-5 py-4">
-
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-brand-accent">
-                  Modern Living
-                </p>
-
-                <p className="mt-1 text-sm font-medium text-white">
-                  Designed for the way you live.
-                </p>
-
-              </div>
 
             </div>
 
@@ -88,7 +81,7 @@ function Home() {
         <CategorySection />
       </div>
 
-      {/* Featured products */}
+      {/* Featured Products */}
 
       <FeaturedProducts />
 

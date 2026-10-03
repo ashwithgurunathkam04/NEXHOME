@@ -60,13 +60,15 @@ function Register() {
 
       <div className="w-full max-w-md">
 
+        {/* Heading */}
+
         <div className="text-center">
 
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
             NEXHOME Account
           </p>
 
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-text-primary">
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl">
             Create your account
           </h1>
 
@@ -76,18 +78,34 @@ function Register() {
 
         </div>
 
-        <div className="mt-8 rounded-2xl border border-border bg-white p-7 shadow-sm sm:p-8">
+        {/* Registration panel */}
+
+        <div className="mt-8 overflow-hidden rounded-2xl border-2 border-brand-accent bg-brand-dark p-7 text-white shadow-sm sm:p-8">
+
+          <div className="mb-7">
+
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
+              Create Account
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-white/55">
+              Enter your details to create your NEXHOME account.
+            </p>
+
+          </div>
 
           <form
             onSubmit={handleSubmit}
             className="space-y-5"
           >
 
+            {/* Full name */}
+
             <div>
 
               <label
                 htmlFor="fullName"
-                className="block text-sm font-semibold text-text-primary"
+                className="block text-sm font-semibold text-white"
               >
                 Full name
               </label>
@@ -100,16 +118,18 @@ function Register() {
                 onChange={handleChange}
                 placeholder="Enter your full name"
                 autoComplete="name"
-                className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
               />
 
             </div>
+
+            {/* Email */}
 
             <div>
 
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold text-text-primary"
+                className="block text-sm font-semibold text-white"
               >
                 Email address
               </label>
@@ -122,16 +142,18 @@ function Register() {
                 onChange={handleChange}
                 placeholder="you@example.com"
                 autoComplete="email"
-                className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
               />
 
             </div>
+
+            {/* Password */}
 
             <div>
 
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold text-text-primary"
+                className="block text-sm font-semibold text-white"
               >
                 Password
               </label>
@@ -144,20 +166,22 @@ function Register() {
                 onChange={handleChange}
                 placeholder="Create a password"
                 autoComplete="new-password"
-                className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
               />
 
-              <p className="mt-2 text-xs text-text-muted">
+              <p className="mt-2 text-xs text-white/40">
                 Use at least 6 characters.
               </p>
 
             </div>
 
+            {/* Confirm password */}
+
             <div>
 
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-semibold text-text-primary"
+                className="block text-sm font-semibold text-white"
               >
                 Confirm password
               </label>
@@ -170,16 +194,20 @@ function Register() {
                 onChange={handleChange}
                 placeholder="Enter your password again"
                 autoComplete="new-password"
-                className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
               />
 
             </div>
 
+            {/* Error */}
+
             {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-danger">
+              <div className="rounded-lg border border-brand-accent/40 bg-brand-accent/10 px-4 py-3 text-sm font-medium text-brand-accent">
                 {error}
               </div>
             )}
+
+            {/* Submit */}
 
             <button
               type="submit"
@@ -190,26 +218,32 @@ function Register() {
 
           </form>
 
+          {/* Divider */}
+
           <div className="my-7 flex items-center gap-4">
 
-            <div className="h-px flex-1 bg-border" />
+            <div className="h-px flex-1 bg-white/10" />
 
-            <span className="text-xs font-medium uppercase tracking-[0.12em] text-text-muted">
+            <span className="text-xs font-medium uppercase tracking-[0.12em] text-white/35">
               Already registered?
             </span>
 
-            <div className="h-px flex-1 bg-border" />
+            <div className="h-px flex-1 bg-white/10" />
 
           </div>
 
+          {/* Login */}
+
           <Link
             to="/login"
-            className="flex w-full items-center justify-center rounded-lg border border-border-strong bg-white px-5 py-3.5 text-sm font-semibold text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
+            className="flex w-full items-center justify-center rounded-lg border border-brand-accent bg-transparent px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent"
           >
             Sign In
           </Link>
 
         </div>
+
+        {/* Back */}
 
         <div className="mt-6 text-center">
 

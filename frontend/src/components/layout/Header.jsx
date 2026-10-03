@@ -73,6 +73,8 @@ function Header() {
 
           <div className="ml-auto flex shrink-0 items-center gap-6">
 
+            {/* Wishlist */}
+
             <Link
               to="/wishlist"
               className="hidden items-center gap-2 text-sm font-medium text-white/80 transition-colors hover:text-white lg:flex"
@@ -87,12 +89,25 @@ function Header() {
 
             </Link>
 
+            {/* Orders */}
+
+            <Link
+              to="/orders"
+              className="hidden text-sm font-medium text-white/80 transition-colors hover:text-white lg:block"
+            >
+              Orders
+            </Link>
+
+            {/* Account */}
+
             <Link
               to="/account"
               className="hidden text-sm font-medium text-white/80 transition-colors hover:text-white sm:block"
             >
               Account
             </Link>
+
+            {/* Cart */}
 
             <Link
               to="/cart"

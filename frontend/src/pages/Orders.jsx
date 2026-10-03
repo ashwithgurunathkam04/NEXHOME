@@ -37,13 +37,15 @@ function Orders() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
 
+      {/* Page header */}
+
       <div className="mb-10">
 
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
           Account
         </p>
 
-        <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mt-3 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
 
           <div>
 
@@ -51,8 +53,8 @@ function Orders() {
               My Orders
             </h1>
 
-            <p className="mt-3 text-base text-text-secondary">
-              View your previous purchases and track your orders.
+            <p className="mt-3 max-w-2xl text-base leading-7 text-text-secondary">
+              View your purchases, payment status, and order information.
             </p>
 
           </div>
@@ -68,67 +70,67 @@ function Orders() {
 
       </div>
 
+      {/* Orders */}
+
       <div className="space-y-6">
 
         {demoOrders.map((order) => (
           <article
             key={order.id}
-            className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm"
+            className="overflow-hidden rounded-2xl border-2 border-brand-accent bg-brand-dark text-white shadow-sm"
           >
 
             {/* Order header */}
 
-            <div className="flex flex-col gap-5 border-b border-border bg-surface-soft p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <div className="border-b border-white/10 bg-[#263238] p-5 sm:p-6">
 
-              <div className="grid gap-4 sm:grid-cols-3 sm:gap-10">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
-                <div>
+                <div className="grid gap-5 sm:grid-cols-3 sm:gap-10">
 
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-text-muted">
-                    Order ID
-                  </p>
+                  <div>
 
-                  <p className="mt-1 text-sm font-semibold text-text-primary">
-                    {order.id}
-                  </p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
+                      Order ID
+                    </p>
+
+                    <p className="mt-2 text-sm font-semibold text-white">
+                      {order.id}
+                    </p>
+
+                  </div>
+
+                  <div>
+
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+                      Order Date
+                    </p>
+
+                    <p className="mt-2 text-sm font-medium text-white/85">
+                      {order.date}
+                    </p>
+
+                  </div>
+
+                  <div>
+
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
+                      Order Total
+                    </p>
+
+                    <p className="mt-2 text-sm font-bold text-white">
+                      ₹{order.total.toLocaleString('en-IN')}
+                    </p>
+
+                  </div>
 
                 </div>
 
-                <div>
-
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-text-muted">
-                    Order Date
-                  </p>
-
-                  <p className="mt-1 text-sm font-medium text-text-primary">
-                    {order.date}
-                  </p>
-
-                </div>
-
-                <div>
-
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-text-muted">
-                    Total
-                  </p>
-
-                  <p className="mt-1 text-sm font-semibold text-text-primary">
-                    ₹{order.total.toLocaleString('en-IN')}
-                  </p>
-
-                </div>
+                <span className="w-fit rounded-md border border-brand-accent bg-brand-accent px-3 py-1.5 text-xs font-bold text-white">
+                  {order.status}
+                </span>
 
               </div>
-
-              <span
-                className={`w-fit rounded-full px-3 py-1.5 text-xs font-semibold ${
-                  order.status === 'Delivered'
-                    ? 'bg-green-50 text-success'
-                    : 'bg-brand-accent/10 text-brand-accent'
-                }`}
-              >
-                {order.status}
-              </span>
 
             </div>
 
@@ -141,34 +143,44 @@ function Orders() {
                 {order.items.map((item) => (
                   <div
                     key={`${order.id}-${item.name}`}
-                    className="flex gap-4"
+                    className="flex flex-col gap-4 sm:flex-row"
                   >
 
-                    <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-surface-soft">
+                    {/* Product image placeholder */}
 
-                      <span className="text-xs font-medium text-text-muted">
+                    <div className="flex h-28 w-full shrink-0 items-center justify-center rounded-xl border border-white/10 bg-[#f5f2ec] sm:h-24 sm:w-24">
+
+                      <span className="text-xs font-semibold text-text-secondary">
                         Product Image
                       </span>
 
                     </div>
 
+                    {/* Product information */}
+
                     <div className="min-w-0 flex-1">
 
-                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-accent">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
                         {item.brand}
                       </p>
 
-                      <h2 className="mt-1 text-base font-semibold text-text-primary">
+                      <h2 className="mt-2 text-base font-semibold leading-6 text-white sm:text-lg">
                         {item.name}
                       </h2>
 
-                      <p className="mt-2 text-sm text-text-secondary">
-                        Quantity: {item.quantity}
-                      </p>
+                      <div className="mt-3 flex flex-wrap items-center gap-4">
 
-                      <p className="mt-1 text-sm font-semibold text-text-primary">
-                        ₹{item.price.toLocaleString('en-IN')}
-                      </p>
+                        <p className="text-sm text-white/55">
+                          Quantity: {item.quantity}
+                        </p>
+
+                        <span className="h-1 w-1 rounded-full bg-white/25" />
+
+                        <p className="text-sm font-semibold text-white">
+                          ₹{item.price.toLocaleString('en-IN')}
+                        </p>
+
+                      </div>
 
                     </div>
 
@@ -177,26 +189,29 @@ function Orders() {
 
               </div>
 
-              <div className="mt-6 flex flex-col gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+              {/* Bottom actions */}
+
+              <div className="mt-6 flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
 
                 <div className="flex items-center gap-3">
 
-                  <span className="text-sm text-text-secondary">
+                  <span className="text-sm text-white/55">
                     Payment
                   </span>
 
-                  <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-success">
+                  <span className="rounded-md border border-brand-accent/40 bg-brand-accent/10 px-3 py-1 text-xs font-semibold text-brand-accent">
                     {order.payment}
                   </span>
 
                 </div>
 
-                <button
-                  type="button"
-                  className="text-left text-sm font-semibold text-brand-accent transition-colors hover:text-brand-accent-dark sm:text-right"
+                <Link
+                  to={`/orders/${order.id}`}
+                  className="inline-flex w-fit items-center rounded-lg bg-brand-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
                 >
-                  View Order Details →
-                </button>
+                  View Order Details
+                  <span className="ml-2">→</span>
+                </Link>
 
               </div>
 

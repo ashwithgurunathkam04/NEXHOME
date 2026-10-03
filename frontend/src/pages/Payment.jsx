@@ -46,7 +46,7 @@ function Payment() {
         return
       }
 
-      if (!/^[\w.-]+@[\w.-]+$/.test(paymentData.upiId)) {
+      if (!/^[\w\.-]+@[\w\.-]+$/.test(paymentData.upiId)) {
         setError('Please enter a valid UPI ID.')
         return
       }
@@ -99,7 +99,7 @@ function Payment() {
             Payment
           </p>
 
-          <h1 className="mt-3 text-3xl font-semibold text-text-primary">
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-text-primary sm:text-4xl">
             No order to pay for
           </h1>
 
@@ -123,6 +123,8 @@ function Payment() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
 
+      {/* Header */}
+
       <div className="mb-10">
 
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
@@ -133,7 +135,7 @@ function Payment() {
           Choose your payment method
         </h1>
 
-        <p className="mt-3 text-base text-text-secondary">
+        <p className="mt-3 max-w-2xl text-base leading-7 text-text-secondary">
           Select how you would like to pay for your NEXHOME order.
         </p>
 
@@ -143,15 +145,25 @@ function Payment() {
 
         {/* Payment section */}
 
-        <div className="rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
+        <div className="overflow-hidden rounded-2xl border-2 border-brand-accent bg-brand-dark p-6 text-white shadow-sm sm:p-8">
 
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand-accent">
-            Step 2
-          </p>
+          <div className="border-b border-white/10 pb-6">
 
-          <h2 className="mt-2 text-2xl font-semibold text-text-primary">
-            Payment method
-          </h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand-accent">
+              Step 2
+            </p>
+
+            <h2 className="mt-2 text-2xl font-semibold text-white">
+              Payment method
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-white/50">
+              Choose your preferred payment option.
+            </p>
+
+          </div>
+
+          {/* Payment methods */}
 
           <div className="mt-7 space-y-3">
 
@@ -163,19 +175,20 @@ function Payment() {
                 setPaymentMethod('upi')
                 setError('')
               }}
-              className={`w-full rounded-xl border p-4 text-left transition ${
+              className={`w-full rounded-xl border-2 p-4 text-left transition ${
                 paymentMethod === 'upi'
-                  ? 'border-brand-accent bg-brand-accent/5'
-                  : 'border-border hover:border-brand-accent/50'
+                  ? 'border-brand-accent bg-brand-accent/10'
+                  : 'border-white/10 bg-[#263238] hover:border-brand-accent/50'
               }`}
             >
+
               <div className="flex items-center gap-4">
 
                 <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
                     paymentMethod === 'upi'
                       ? 'border-brand-accent'
-                      : 'border-border-strong'
+                      : 'border-white/30'
                   }`}
                 >
                   {paymentMethod === 'upi' && (
@@ -185,17 +198,18 @@ function Payment() {
 
                 <div>
 
-                  <p className="text-sm font-semibold text-text-primary">
+                  <p className="text-sm font-semibold text-white">
                     UPI
                   </p>
 
-                  <p className="mt-1 text-xs text-text-secondary">
+                  <p className="mt-1 text-xs leading-5 text-white/45">
                     Pay using Google Pay, PhonePe, Paytm or another UPI app.
                   </p>
 
                 </div>
 
               </div>
+
             </button>
 
             {/* Card */}
@@ -206,19 +220,20 @@ function Payment() {
                 setPaymentMethod('card')
                 setError('')
               }}
-              className={`w-full rounded-xl border p-4 text-left transition ${
+              className={`w-full rounded-xl border-2 p-4 text-left transition ${
                 paymentMethod === 'card'
-                  ? 'border-brand-accent bg-brand-accent/5'
-                  : 'border-border hover:border-brand-accent/50'
+                  ? 'border-brand-accent bg-brand-accent/10'
+                  : 'border-white/10 bg-[#263238] hover:border-brand-accent/50'
               }`}
             >
+
               <div className="flex items-center gap-4">
 
                 <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
                     paymentMethod === 'card'
                       ? 'border-brand-accent'
-                      : 'border-border-strong'
+                      : 'border-white/30'
                   }`}
                 >
                   {paymentMethod === 'card' && (
@@ -228,17 +243,18 @@ function Payment() {
 
                 <div>
 
-                  <p className="text-sm font-semibold text-text-primary">
+                  <p className="text-sm font-semibold text-white">
                     Credit / Debit Card
                   </p>
 
-                  <p className="mt-1 text-xs text-text-secondary">
+                  <p className="mt-1 text-xs leading-5 text-white/45">
                     Securely pay using your credit or debit card.
                   </p>
 
                 </div>
 
               </div>
+
             </button>
 
             {/* COD */}
@@ -249,19 +265,20 @@ function Payment() {
                 setPaymentMethod('cod')
                 setError('')
               }}
-              className={`w-full rounded-xl border p-4 text-left transition ${
+              className={`w-full rounded-xl border-2 p-4 text-left transition ${
                 paymentMethod === 'cod'
-                  ? 'border-brand-accent bg-brand-accent/5'
-                  : 'border-border hover:border-brand-accent/50'
+                  ? 'border-brand-accent bg-brand-accent/10'
+                  : 'border-white/10 bg-[#263238] hover:border-brand-accent/50'
               }`}
             >
+
               <div className="flex items-center gap-4">
 
                 <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
                     paymentMethod === 'cod'
                       ? 'border-brand-accent'
-                      : 'border-border-strong'
+                      : 'border-white/30'
                   }`}
                 >
                   {paymentMethod === 'cod' && (
@@ -271,17 +288,18 @@ function Payment() {
 
                 <div>
 
-                  <p className="text-sm font-semibold text-text-primary">
+                  <p className="text-sm font-semibold text-white">
                     Cash on Delivery
                   </p>
 
-                  <p className="mt-1 text-xs text-text-secondary">
+                  <p className="mt-1 text-xs leading-5 text-white/45">
                     Pay when your order is delivered.
                   </p>
 
                 </div>
 
               </div>
+
             </button>
 
           </div>
@@ -293,7 +311,7 @@ function Payment() {
 
               <label
                 htmlFor="upiId"
-                className="block text-sm font-semibold text-text-primary"
+                className="block text-sm font-semibold text-white"
               >
                 UPI ID
               </label>
@@ -305,7 +323,7 @@ function Payment() {
                 value={paymentData.upiId}
                 onChange={handleChange}
                 placeholder="example@upi"
-                className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
               />
 
             </div>
@@ -320,7 +338,7 @@ function Payment() {
 
                 <label
                   htmlFor="cardName"
-                  className="block text-sm font-semibold text-text-primary"
+                  className="block text-sm font-semibold text-white"
                 >
                   Name on card
                 </label>
@@ -332,7 +350,7 @@ function Payment() {
                   value={paymentData.cardName}
                   onChange={handleChange}
                   placeholder="Enter name on card"
-                  className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                  className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                 />
 
               </div>
@@ -341,7 +359,7 @@ function Payment() {
 
                 <label
                   htmlFor="cardNumber"
-                  className="block text-sm font-semibold text-text-primary"
+                  className="block text-sm font-semibold text-white"
                 >
                   Card number
                 </label>
@@ -355,7 +373,7 @@ function Payment() {
                   onChange={handleChange}
                   placeholder="16-digit card number"
                   maxLength="16"
-                  className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                  className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                 />
 
               </div>
@@ -366,7 +384,7 @@ function Payment() {
 
                   <label
                     htmlFor="expiry"
-                    className="block text-sm font-semibold text-text-primary"
+                    className="block text-sm font-semibold text-white"
                   >
                     Expiry
                   </label>
@@ -379,7 +397,7 @@ function Payment() {
                     onChange={handleChange}
                     placeholder="MM/YY"
                     maxLength="5"
-                    className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                    className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                   />
 
                 </div>
@@ -388,7 +406,7 @@ function Payment() {
 
                   <label
                     htmlFor="cvv"
-                    className="block text-sm font-semibold text-text-primary"
+                    className="block text-sm font-semibold text-white"
                   >
                     CVV
                   </label>
@@ -402,7 +420,7 @@ function Payment() {
                     onChange={handleChange}
                     placeholder="CVV"
                     maxLength="4"
-                    className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                    className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                   />
 
                 </div>
@@ -415,13 +433,13 @@ function Payment() {
           {/* COD */}
 
           {paymentMethod === 'cod' && (
-            <div className="mt-7 rounded-xl border border-border bg-surface-soft p-5">
+            <div className="mt-7 rounded-xl border border-brand-accent/40 bg-brand-accent/10 p-5">
 
-              <p className="text-sm font-semibold text-text-primary">
+              <p className="text-sm font-semibold text-white">
                 Cash on Delivery selected
               </p>
 
-              <p className="mt-2 text-sm leading-6 text-text-secondary">
+              <p className="mt-2 text-sm leading-6 text-white/55">
                 You will pay the order amount when the package is delivered
                 to your address.
               </p>
@@ -429,11 +447,15 @@ function Payment() {
             </div>
           )}
 
+          {/* Error */}
+
           {error && (
-            <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-danger">
+            <div className="mt-6 rounded-lg border border-brand-accent/40 bg-brand-accent/10 px-4 py-3 text-sm font-medium text-brand-accent">
               {error}
             </div>
           )}
+
+          {/* Payment action */}
 
           <form onSubmit={handlePayment}>
 
@@ -450,7 +472,7 @@ function Payment() {
 
           <Link
             to="/checkout"
-            className="mt-5 block text-center text-sm font-medium text-text-secondary transition-colors hover:text-brand-accent"
+            className="mt-5 block text-center text-sm font-medium text-white/50 transition-colors hover:text-brand-accent"
           >
             ← Back to delivery details
           </Link>
@@ -459,13 +481,13 @@ function Payment() {
 
         {/* Order summary */}
 
-        <aside className="h-fit rounded-2xl border border-border bg-white p-6 shadow-sm">
+        <aside className="h-fit overflow-hidden rounded-2xl border-2 border-brand-accent bg-brand-dark p-6 text-white shadow-sm lg:sticky lg:top-6">
 
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand-accent">
             Order Summary
           </p>
 
-          <h2 className="mt-2 text-2xl font-semibold text-text-primary">
+          <h2 className="mt-2 text-2xl font-semibold text-white">
             Total payable
           </h2>
 
@@ -473,11 +495,11 @@ function Payment() {
 
             <div className="flex items-center justify-between text-sm">
 
-              <span className="text-text-secondary">
+              <span className="text-white/55">
                 Products
               </span>
 
-              <span className="font-medium text-text-primary">
+              <span className="font-medium text-white">
                 ₹{cartSubtotal.toLocaleString('en-IN')}
               </span>
 
@@ -485,11 +507,11 @@ function Payment() {
 
             <div className="flex items-center justify-between text-sm">
 
-              <span className="text-text-secondary">
+              <span className="text-white/55">
                 Delivery
               </span>
 
-              <span className="font-medium text-text-primary">
+              <span className="font-medium text-white">
                 {deliveryCharge === 0
                   ? 'FREE'
                   : `₹${deliveryCharge}`}
@@ -497,15 +519,15 @@ function Payment() {
 
             </div>
 
-            <div className="border-t border-border pt-5">
+            <div className="border-t border-white/10 pt-5">
 
               <div className="flex items-center justify-between">
 
-                <span className="font-semibold text-text-primary">
+                <span className="font-semibold text-white">
                   Total
                 </span>
 
-                <span className="text-2xl font-bold text-text-primary">
+                <span className="text-2xl font-bold text-white">
                   ₹{orderTotal.toLocaleString('en-IN')}
                 </span>
 
@@ -515,9 +537,9 @@ function Payment() {
 
           </div>
 
-          <div className="mt-6 rounded-lg bg-surface-soft p-4">
+          <div className="mt-6 rounded-lg border border-white/10 bg-[#263238] p-4">
 
-            <p className="text-xs leading-5 text-text-secondary">
+            <p className="text-xs leading-5 text-white/45">
               Your payment details are currently handled only by this
               frontend demo. Real payment processing will be integrated
               securely through the backend and payment gateway.
