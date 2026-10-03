@@ -17,10 +17,8 @@ const imageScales = [
   0.96,
 ]
 
-const createImage = (query, lock) => {
-  return `https://loremflickr.com/900/700/${encodeURIComponent(
-    query,
-  )}?lock=${lock}`
+const createImage = (query, id, category) => {
+  return `/products/${category}/${id}.jpg`
 }
 
 const createProduct = ({
@@ -46,13 +44,21 @@ const createProduct = ({
     reviews,
     stock,
 
-    image: createImage(imageQuery, id),
+    image: createImage(
+      imageQuery,
+      id,
+      category,
+    ),
 
     imageBackground:
-      imageBackgrounds[id % imageBackgrounds.length],
+      imageBackgrounds[
+      id % imageBackgrounds.length
+      ],
 
     imageScale:
-      imageScales[id % imageScales.length],
+      imageScales[
+      id % imageScales.length
+      ],
 
     imagePosition: 'center',
   }

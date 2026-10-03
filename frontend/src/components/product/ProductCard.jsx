@@ -4,34 +4,50 @@ import { Link } from 'react-router-dom'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 
-const productImages = {
-  1: 'https://www.lg.com/content/dam/channel/wcms/in/images/split-ac/us-q19snze/gallery/US-Q19SNZE-MZ-02.jpg',
+const imageExtensions = [
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+  '.avif',
+]
 
-  2: 'https://media.karousell.com/media/photos/products/2024/12/10/samsung_inverter_split_type_ai_1733838895_e89e1911_progressive.jpg',
+function getNextImagePath(currentPath, extensionIndex) {
+  const pathWithoutExtension =
+    currentPath.replace(
+      /\.(jpg|jpeg|png|webp|avif)$/i,
+      '',
+    )
 
-  3: 'https://jesaelectronics.com/common/images/products/gallery/144215320.jpg',
+  const nextExtension =
+    imageExtensions[extensionIndex]
 
-  4: 'https://vasanthandco.in/UploadedFiles/productimages/20250326110317-Untitled-1.png',
+  if (!nextExtension) {
+    return null
+  }
+
+  return `${pathWithoutExtension}${nextExtension}`
 }
-
-const fallbackImage =
-  'https://www.lg.com/content/dam/channel/wcms/in/images/split-ac/us-q19snze/gallery/US-Q19SNZE-MZ-02.jpg'
 
 function ProductCard({ product }) {
   const { addToCart } = useCart()
   const { isInWishlist, toggleWishlist } = useWishlist()
 
   const [imageSrc, setImageSrc] = useState(
-    productImages[product.id] || product.image || fallbackImage,
+    product.image,
   )
+
+  const [imageExtensionIndex, setImageExtensionIndex] =
+    useState(0)
 
   const discount = Math.round(
     ((product.originalPrice - product.price) /
       product.originalPrice) *
-      100,
+    100,
   )
 
-  const productInWishlist = isInWishlist(product.id)
+  const productInWishlist =
+    isInWishlist(product.id)
 
   const handleAddToCart = () => {
     addToCart(product)
@@ -45,8 +61,18 @@ function ProductCard({ product }) {
   }
 
   const handleImageError = () => {
-    if (imageSrc !== fallbackImage) {
-      setImageSrc(fallbackImage)
+    const nextIndex =
+      imageExtensionIndex + 1
+
+    const nextImagePath =
+      getNextImagePath(
+        product.image,
+        nextIndex,
+      )
+
+    if (nextImagePath) {
+      setImageExtensionIndex(nextIndex)
+      setImageSrc(nextImagePath)
     }
   }
 
@@ -55,23 +81,19 @@ function ProductCard({ product }) {
 
       <Link to={`/products/${product.id}`}>
 
-        {/* Product Image */}
+        <div className="relative h-72 w-full overflow-hidden bg-[#f5f2ec]">
 
-        <div
-          className="relative flex h-72 items-center justify-center overflow-hidden"
-          style={{
-            backgroundColor:
-              product.imageBackground || '#f5f2ec',
-          }}
-        >
+          <img
+            src={imageSrc}
+            alt={product.name}
+            loading="lazy"
+            onError={handleImageError}
+            className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+          />
 
-          {/* Discount */}
-
-          <span className="absolute left-5 top-5 z-20 rounded-md bg-brand-accent px-3 py-1.5 text-xs font-bold text-white shadow-sm">
+          <span className="absolute left-5 top-5 z-20 rounded-md bg-brand-accent px-3 py-1.5 text-xs font-bold text-white shadow-md">
             {discount}% OFF
           </span>
-
-          {/* Wishlist */}
 
           <button
             type="button"
@@ -81,28 +103,17 @@ function ProductCard({ product }) {
                 ? 'Remove product from wishlist'
                 : 'Add product to wishlist'
             }
-            className={`absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border bg-white text-xl shadow-md transition ${
-              productInWishlist
+            className={`absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border bg-white text-xl shadow-md transition ${productInWishlist
                 ? 'border-brand-accent text-brand-accent'
                 : 'border-border text-text-primary hover:border-brand-accent hover:text-brand-accent'
-            }`}
+              }`}
           >
-            {productInWishlist ? '♥' : '♡'}
+            {productInWishlist
+              ? '♥'
+              : '♡'}
           </button>
 
-          {/* Actual Product Image */}
-
-          <img
-            src={imageSrc}
-            alt={product.name}
-            loading="lazy"
-            onError={handleImageError}
-            className="h-full w-full object-contain p-8 transition-transform duration-500 group-hover:scale-105"
-          />
-
         </div>
-
-        {/* Product Information */}
 
         <div className="p-6">
 
@@ -129,11 +140,17 @@ function ProductCard({ product }) {
           <div className="mt-5 flex items-baseline gap-3">
 
             <span className="text-2xl font-bold">
-              ₹{product.price.toLocaleString('en-IN')}
+              ₹
+              {product.price.toLocaleString(
+                'en-IN',
+              )}
             </span>
 
             <span className="text-sm text-white/40 line-through">
-              ₹{product.originalPrice.toLocaleString('en-IN')}
+              ₹
+              {product.originalPrice.toLocaleString(
+                'en-IN',
+              )}
             </span>
 
           </div>
@@ -141,8 +158,6 @@ function ProductCard({ product }) {
         </div>
 
       </Link>
-
-      {/* Add To Cart */}
 
       <div className="px-6 pb-6">
 
