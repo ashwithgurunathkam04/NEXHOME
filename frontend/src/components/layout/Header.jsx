@@ -1,9 +1,17 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { useCart } from '@/context/CartContext'
+import { useWishlist } from '@/context/WishlistContext'
+
 function Header() {
   const [searchQuery, setSearchQuery] = useState('')
+
   const navigate = useNavigate()
+
+  const { cartCount } = useCart()
+
+  const { wishlistCount } = useWishlist()
 
   const handleSearch = (event) => {
     event.preventDefault()
@@ -14,15 +22,20 @@ function Header() {
       return
     }
 
-    navigate(`/products?search=${encodeURIComponent(trimmedQuery)}`)
+    navigate(
+      `/products?search=${encodeURIComponent(trimmedQuery)}`
+    )
   }
 
   return (
     <header className="bg-brand-dark text-white shadow-sm">
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Main Header */}
+
+        {/* Main header */}
+
         <div className="flex min-h-20 items-center gap-6">
-          {/* Logo */}
+
           <Link
             to="/"
             className="shrink-0 text-2xl font-bold tracking-[-0.04em] text-white"
@@ -30,38 +43,52 @@ function Header() {
             NEX<span className="text-brand-accent">HOME</span>
           </Link>
 
-          {/* Search */}
           <form
             onSubmit={handleSearch}
             className="hidden min-w-0 flex-1 md:block"
           >
-            <label htmlFor="header-search" className="sr-only">
+            <label
+              htmlFor="header-search"
+              className="sr-only"
+            >
               Search products
             </label>
 
             <div className="mx-auto max-w-2xl">
+
               <input
                 id="header-search"
                 type="search"
                 value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
+                onChange={(event) =>
+                  setSearchQuery(event.target.value)
+                }
                 placeholder="Search products, brands and categories"
                 className="h-11 w-full rounded-lg border border-white/15 bg-white px-4 text-sm text-brand-dark outline-none placeholder:text-gray-500 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30"
               />
+
             </div>
+
           </form>
 
-          {/* Actions */}
           <div className="ml-auto flex shrink-0 items-center gap-6">
+
             <Link
               to="/wishlist"
-              className="hidden text-sm font-medium text-white/80 transition-colors hover:text-white lg:block"
+              className="hidden items-center gap-2 text-sm font-medium text-white/80 transition-colors hover:text-white lg:flex"
             >
               Wishlist
+
+              {wishlistCount > 0 && (
+                <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-brand-accent px-1.5 py-0.5 text-xs font-bold text-white">
+                  {wishlistCount}
+                </span>
+              )}
+
             </Link>
 
             <Link
-              to="/login"
+              to="/account"
               className="hidden text-sm font-medium text-white/80 transition-colors hover:text-white sm:block"
             >
               Account
@@ -69,16 +96,28 @@ function Header() {
 
             <Link
               to="/cart"
-              className="rounded-md bg-brand-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
+              className="relative rounded-md bg-brand-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
             >
               Bag
+
+              {cartCount > 0 && (
+                <span className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-bold text-brand-dark">
+                  {cartCount}
+                </span>
+              )}
+
             </Link>
+
           </div>
+
         </div>
 
-        {/* Category Navigation */}
+        {/* Category navigation */}
+
         <div className="border-t border-white/10">
-          <nav className="flex h-12 items-center gap-7 overflow-x-auto">
+
+          <nav className="flex h-12 items-center gap-7 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+
             <Link
               to="/products"
               className="shrink-0 text-sm font-semibold text-white"
@@ -115,10 +154,31 @@ function Header() {
             </Link>
 
             <Link
+              to="/products?category=small-kitchen"
+              className="shrink-0 text-sm text-white/70 transition-colors hover:text-white"
+            >
+              Small Kitchen
+            </Link>
+
+            <Link
               to="/products?category=cleaning"
               className="shrink-0 text-sm text-white/70 transition-colors hover:text-white"
             >
               Cleaning
+            </Link>
+
+            <Link
+              to="/products?category=water"
+              className="shrink-0 text-sm text-white/70 transition-colors hover:text-white"
+            >
+              Water
+            </Link>
+
+            <Link
+              to="/products?category=personal-care"
+              className="shrink-0 text-sm text-white/70 transition-colors hover:text-white"
+            >
+              Personal Care
             </Link>
 
             <Link
@@ -129,10 +189,10 @@ function Header() {
             </Link>
 
             <Link
-              to="/products?category=technology"
+              to="/products?category=lighting-electrical"
               className="shrink-0 text-sm text-white/70 transition-colors hover:text-white"
             >
-              Technology
+              Lighting & Electrical
             </Link>
 
             <Link
@@ -141,9 +201,20 @@ function Header() {
             >
               Gaming
             </Link>
+
+            <Link
+              to="/products?category=accessories"
+              className="shrink-0 text-sm text-white/70 transition-colors hover:text-white"
+            >
+              Accessories
+            </Link>
+
           </nav>
+
         </div>
+
       </div>
+
     </header>
   )
 }

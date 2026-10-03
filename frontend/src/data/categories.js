@@ -2,62 +2,62 @@ const categories = [
   {
     id: 'cooling-climate',
     name: 'Cooling & Climate',
-    description: 'ACs, coolers, purifiers, heaters and fans',
+    description: 'Air conditioners, air coolers, heaters, purifiers and fans.',
   },
   {
     id: 'refrigeration',
     name: 'Refrigeration',
-    description: 'Refrigerators, freezers and mini fridges',
+    description: 'Refrigerators, freezers and compact cooling solutions.',
   },
   {
     id: 'laundry',
     name: 'Laundry',
-    description: 'Washing machines, dryers and washer dryers',
+    description: 'Washing machines, dryers and complete laundry solutions.',
   },
   {
     id: 'kitchen',
     name: 'Kitchen Appliances',
-    description: 'Ovens, microwaves, dishwashers and more',
+    description: 'Ovens, microwaves, dishwashers and everyday kitchen appliances.',
   },
   {
     id: 'small-kitchen',
     name: 'Small Kitchen',
-    description: 'Mixers, air fryers, kettles and coffee makers',
+    description: 'Mixers, air fryers, kettles, coffee makers and more.',
   },
   {
     id: 'cleaning',
     name: 'Cleaning Appliances',
-    description: 'Vacuum cleaners, robot vacuums and steam cleaners',
+    description: 'Vacuum cleaners, robot vacuums and steam cleaning appliances.',
   },
   {
     id: 'water',
     name: 'Water Appliances',
-    description: 'Water purifiers, heaters and dispensers',
+    description: 'Water purifiers, dispensers, heaters and related appliances.',
   },
   {
     id: 'personal-care',
     name: 'Personal Care',
-    description: 'Grooming, hair care and personal wellness devices',
+    description: 'Hair care, grooming and personal wellness devices.',
   },
   {
     id: 'entertainment',
     name: 'Entertainment',
-    description: 'Smart TVs, soundbars, speakers and home theater',
+    description: 'Smart TVs, speakers, soundbars and home entertainment.',
   },
   {
     id: 'lighting-electrical',
     name: 'Lighting & Electrical',
-    description: 'Smart lights, plugs, bulbs and electrical essentials',
+    description: 'Smart lights, bulbs, plugs and electrical essentials.',
   },
   {
     id: 'gaming',
     name: 'Gaming',
-    description: 'Consoles, controllers and gaming accessories',
+    description: 'Gaming consoles, controllers and gaming accessories.',
   },
   {
     id: 'accessories',
     name: 'Accessories',
-    description: 'Headphones, chargers, cables and power accessories',
+    description: 'Headphones, chargers, cables and everyday tech accessories.',
   },
 ]
 

@@ -1,219 +1,246 @@
 import { Link, useParams } from 'react-router-dom'
+
 import products from '@/data/products'
+import { useCart } from '@/context/CartContext'
+import { useWishlist } from '@/context/WishlistContext'
 
 function ProductDetails() {
   const { id } = useParams()
 
   const product = products.find(
-    (item) => item.id === Number(id)
+    (item) => String(item.id) === String(id)
   )
+
+  const { addToCart } = useCart()
+
+  const {
+    isInWishlist,
+    toggleWishlist,
+  } = useWishlist()
 
   if (!product) {
     return (
-      <div className="bg-surface">
-        <div className="mx-auto flex min-h-[60vh] max-w-7xl items-center justify-center px-6 py-16 lg:px-8">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-accent">
-              NEXHOME
-            </p>
+      <section className="mx-auto flex min-h-[60vh] max-w-7xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
+        <div className="text-center">
 
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-text-primary">
-              Product not found
-            </h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
+            Product not found
+          </p>
 
-            <p className="mt-3 text-text-secondary">
-              The product you are looking for does not exist.
-            </p>
+          <h1 className="mt-3 text-3xl font-semibold text-text-primary">
+            We couldn't find that product.
+          </h1>
 
-            <Link
-              to="/products"
-              className="mt-7 inline-flex rounded-lg bg-brand-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
-            >
-              Back to products
-            </Link>
-          </div>
+          <p className="mt-3 text-text-secondary">
+            The product may have been removed or the link may be incorrect.
+          </p>
+
+          <Link
+            to="/products"
+            className="mt-7 inline-flex rounded-lg bg-brand-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
+          >
+            Browse products
+          </Link>
+
         </div>
-      </div>
+      </section>
     )
   }
 
   const discount = Math.round(
     ((product.originalPrice - product.price) /
       product.originalPrice) *
-      100
+      100,
   )
 
+  const productInWishlist =
+    isInWishlist(product.id)
+
+  const handleAddToCart = () => {
+    addToCart(product)
+  }
+
+  const handleWishlistToggle = () => {
+    toggleWishlist(product)
+  }
+
   return (
-    <div className="bg-surface">
-      {/* Breadcrumb */}
-      <section className="border-b border-border bg-surface">
-        <div className="mx-auto max-w-7xl px-6 py-5 lg:px-8">
-          <div className="flex items-center gap-2 text-sm">
-            <Link
-              to="/"
-              className="text-text-muted transition-colors hover:text-text-primary"
-            >
-              Home
-            </Link>
+    <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
 
-            <span className="text-text-muted">/</span>
+      <div className="mb-8 flex flex-wrap items-center gap-2 text-sm text-text-secondary">
+        <Link
+          to="/"
+          className="transition-colors hover:text-brand-accent"
+        >
+          Home
+        </Link>
 
-            <Link
-              to="/products"
-              className="text-text-muted transition-colors hover:text-text-primary"
-            >
-              Products
-            </Link>
+        <span>/</span>
 
-            <span className="text-text-muted">/</span>
+        <Link
+          to="/products"
+          className="transition-colors hover:text-brand-accent"
+        >
+          Products
+        </Link>
 
-            <span className="truncate font-medium text-text-primary">
-              {product.name}
+        <span>/</span>
+
+        <span className="text-text-primary">
+          {product.name}
+        </span>
+      </div>
+
+      <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+
+        {/* Product image area */}
+
+        <div className="overflow-hidden rounded-3xl border border-border bg-white">
+
+          <div className="relative flex min-h-[480px] items-center justify-center bg-[#f5f2ec] p-10">
+
+            <span className="absolute left-6 top-6 rounded-md bg-brand-accent px-3 py-1.5 text-xs font-bold text-white">
+              {discount}% OFF
             </span>
+
+            <div className="flex h-full min-h-[400px] w-full items-center justify-center text-center">
+
+              <p className="max-w-xs text-sm font-medium text-text-secondary">
+                Product image will be added later
+              </p>
+
+            </div>
+
           </div>
+
         </div>
-      </section>
 
-      {/* Product Details */}
-      <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Product Image */}
-          <div className="overflow-hidden rounded-2xl border-2 border-brand-accent bg-white">
-            <div className="relative aspect-square">
-              <span className="absolute left-6 top-6 z-10 rounded-md bg-brand-accent px-3 py-1.5 text-xs font-bold text-white">
-                {discount}% OFF
+        {/* Product information */}
+
+        <div className="flex flex-col justify-center">
+
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
+            {product.brand}
+          </p>
+
+          <h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-text-primary sm:text-4xl">
+            {product.name}
+          </h1>
+
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+
+            <span className="rounded-md bg-brand-dark px-3 py-1.5 text-sm font-semibold text-white">
+              ★ {product.rating}
+            </span>
+
+            <span className="text-sm text-text-secondary">
+              {product.reviews} reviews
+            </span>
+
+            {product.stock > 0 && (
+              <span className="rounded-md bg-green-50 px-3 py-1.5 text-sm font-semibold text-success">
+                In stock
               </span>
+            )}
 
-              <img
-                src={product.image}
-                alt={product.name}
-                className="h-full w-full object-contain p-8"
-              />
-            </div>
           </div>
 
-          {/* Product Information */}
-          <div className="flex flex-col justify-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-accent">
-              {product.brand}
-            </p>
+          <div className="mt-8 flex items-baseline gap-4">
 
-            <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-text-primary sm:text-4xl">
-              {product.name}
-            </h1>
+            <span className="text-4xl font-bold tracking-tight text-text-primary">
+              ₹{product.price.toLocaleString('en-IN')}
+            </span>
 
-            {/* Rating */}
-            <div className="mt-6 flex items-center gap-3">
-              <span className="rounded-md bg-brand-dark px-3 py-1.5 text-sm font-semibold text-white">
-                ★ {product.rating}
-              </span>
+            <span className="text-lg text-text-muted line-through">
+              ₹{product.originalPrice.toLocaleString('en-IN')}
+            </span>
 
-              <span className="text-sm text-text-secondary">
-                {product.reviews} customer reviews
-              </span>
-            </div>
+          </div>
 
-            {/* Price */}
-            <div className="mt-8 border-y border-border py-7">
-              <div className="flex items-baseline gap-4">
-                <span className="text-4xl font-bold tracking-tight text-text-primary">
-                  ₹{product.price.toLocaleString('en-IN')}
-                </span>
+          <p className="mt-2 text-sm font-semibold text-brand-accent">
+            Save ₹
+            {(
+              product.originalPrice -
+              product.price
+            ).toLocaleString('en-IN')}
+          </p>
 
-                <span className="text-lg text-text-muted line-through">
-                  ₹{product.originalPrice.toLocaleString('en-IN')}
-                </span>
+          <div className="mt-8 border-t border-border pt-8">
 
-                <span className="rounded-md bg-brand-accent/10 px-2.5 py-1 text-sm font-bold text-brand-accent">
-                  {discount}% OFF
-                </span>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-text-primary">
+              Product information
+            </h2>
+
+            <dl className="mt-5 space-y-4">
+
+              <div className="flex justify-between gap-6 border-b border-border pb-4">
+                <dt className="text-sm text-text-secondary">
+                  Category
+                </dt>
+
+                <dd className="text-right text-sm font-medium text-text-primary">
+                  {product.category}
+                </dd>
               </div>
 
-              <p className="mt-3 text-sm text-text-secondary">
-                Inclusive of applicable taxes
-              </p>
-            </div>
+              <div className="flex justify-between gap-6 border-b border-border pb-4">
+                <dt className="text-sm text-text-secondary">
+                  Brand
+                </dt>
 
-            {/* Delivery */}
-            <div className="mt-7 rounded-xl border border-border bg-surface-card p-5">
-              <p className="text-sm font-semibold text-text-primary">
-                Delivery available
-              </p>
+                <dd className="text-right text-sm font-medium text-text-primary">
+                  {product.brand}
+                </dd>
+              </div>
 
-              <p className="mt-1 text-sm text-text-secondary">
-                Enter your location at checkout to see delivery options.
-              </p>
-            </div>
+              <div className="flex justify-between gap-6">
+                <dt className="text-sm text-text-secondary">
+                  Availability
+                </dt>
 
-            {/* Actions */}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                className="flex-1 rounded-lg border-2 border-brand-accent px-6 py-3.5 text-sm font-semibold text-brand-accent transition-colors hover:bg-brand-accent hover:text-white"
-              >
-                Add to Cart
-              </button>
+                <dd className="text-right text-sm font-medium text-text-primary">
+                  {product.stock > 0
+                    ? `${product.stock} units available`
+                    : 'Out of stock'}
+                </dd>
+              </div>
 
-              <button
-                type="button"
-                className="flex-1 rounded-lg bg-brand-accent px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
-              >
-                Buy Now
-              </button>
-            </div>
+            </dl>
 
-            {/* Product Information */}
-            <div className="mt-10 border-t border-border pt-8">
-              <h2 className="text-base font-semibold text-text-primary">
-                Product information
-              </h2>
-
-              <dl className="mt-5 divide-y divide-border">
-                <div className="flex justify-between gap-6 py-4">
-                  <dt className="text-sm text-text-secondary">
-                    Brand
-                  </dt>
-
-                  <dd className="text-sm font-medium text-text-primary">
-                    {product.brand}
-                  </dd>
-                </div>
-
-                <div className="flex justify-between gap-6 py-4">
-                  <dt className="text-sm text-text-secondary">
-                    Category
-                  </dt>
-
-                  <dd className="text-sm font-medium capitalize text-text-primary">
-                    {product.category.replaceAll('-', ' ')}
-                  </dd>
-                </div>
-
-                <div className="flex justify-between gap-6 py-4">
-                  <dt className="text-sm text-text-secondary">
-                    Customer rating
-                  </dt>
-
-                  <dd className="text-sm font-medium text-text-primary">
-                    {product.rating} / 5
-                  </dd>
-                </div>
-
-                <div className="flex justify-between gap-6 py-4">
-                  <dt className="text-sm text-text-secondary">
-                    Reviews
-                  </dt>
-
-                  <dd className="text-sm font-medium text-text-primary">
-                    {product.reviews}
-                  </dd>
-                </div>
-              </dl>
-            </div>
           </div>
+
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={product.stock <= 0}
+              className="flex-1 rounded-lg bg-brand-accent px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Add to Cart
+            </button>
+
+            <button
+              type="button"
+              onClick={handleWishlistToggle}
+              className={`rounded-lg border px-6 py-3.5 text-sm font-semibold transition-colors ${
+                productInWishlist
+                  ? 'border-brand-accent bg-brand-accent text-white'
+                  : 'border-border-strong bg-white text-text-primary hover:border-brand-accent hover:text-brand-accent'
+              }`}
+            >
+              {productInWishlist
+                ? 'Remove from Wishlist'
+                : 'Add to Wishlist'}
+            </button>
+
+          </div>
+
         </div>
-      </section>
-    </div>
+
+      </div>
+
+    </section>
   )
 }
 

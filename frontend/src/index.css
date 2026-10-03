@@ -1,30 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  /* NEXHOME Brand */
   --color-brand-dark: #202124;
   --color-brand-accent: #d97736;
   --color-brand-accent-dark: #b85d24;
 
-  /* Surfaces */
   --color-surface: #f4f0e8;
   --color-surface-card: #fffdf9;
   --color-surface-soft: #ebe5da;
 
-  /* Text */
   --color-text-primary: #202124;
   --color-text-secondary: #5f6062;
   --color-text-muted: #7d7e80;
 
-  /* Borders */
   --color-border: #ddd6ca;
   --color-border-strong: #c9c0b1;
 
-  /* Semantic */
   --color-success: #198754;
   --color-danger: #d64545;
 
-  /* Typography */
   --font-sans:
     Inter,
     ui-sans-serif,
@@ -60,6 +54,7 @@
 
 html {
   scroll-behavior: smooth;
+  background: #f4f0e8;
 }
 
 body {
@@ -69,18 +64,56 @@ body {
   background: #f4f0e8;
 }
 
+body,
 button,
 input,
 textarea,
 select {
-  font: inherit;
+  font-family: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 img {
   display: block;
   max-width: 100%;
+}
+
+input,
+textarea,
+select {
+  outline: none;
+}
+
+::selection {
+  background: #d97736;
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ebe5da;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c9c0b1;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d97736;
 }
