@@ -1,7 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
+
 import { useState } from 'react'
 
 import { useCart } from '@/context/CartContext'
+
+import { createAddress } from '@/services/addressService'
 
 function Checkout() {
     const navigate = useNavigate()
@@ -19,6 +22,9 @@ function Checkout() {
 
     const [error, setError] = useState('')
 
+    const [isSubmitting, setIsSubmitting] =
+        useState(false)
+
     const deliveryCharge =
         cartSubtotal >= 10000 ? 0 : 99
 
@@ -34,44 +40,117 @@ function Checkout() {
         }))
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
 
         setError('')
 
-        const hasEmptyField = Object.values(address).some(
-            (value) => !value.trim(),
-        )
+        const hasEmptyField =
+            Object.values(address).some(
+                (value) => !value.trim(),
+            )
 
         if (hasEmptyField) {
-            setError('Please fill in all delivery address details.')
+            setError(
+                'Please fill in all delivery address details.',
+            )
             return
         }
 
         if (!/^[0-9]{10}$/.test(address.phone)) {
-            setError('Please enter a valid 10-digit phone number.')
+            setError(
+                'Please enter a valid 10-digit phone number.',
+            )
             return
         }
 
         if (!/^[0-9]{6}$/.test(address.pincode)) {
-            setError('Please enter a valid 6-digit PIN code.')
+            setError(
+                'Please enter a valid 6-digit PIN code.',
+            )
             return
         }
 
-        /*
-          Order creation and payment will be connected
-          to Django later.
-        */
+        try {
+            setIsSubmitting(true)
 
-        navigate('/payment')
+            const createdAddress =
+                await createAddress({
+                    addressType: 'home',
+
+                    fullName:
+                        address.fullName,
+
+                    phone:
+                        address.phone,
+
+                    addressLine:
+                        address.addressLine,
+
+                    city:
+                        address.city,
+
+                    state:
+                        address.state,
+
+                    pincode:
+                        address.pincode,
+
+                    isDefault: false,
+                })
+
+            if (!createdAddress?.id) {
+                setError(
+                    'Unable to save your delivery address.',
+                )
+                return
+            }
+
+            sessionStorage.setItem(
+                'nexhome-checkout-address-id',
+                String(createdAddress.id),
+            )
+
+            navigate('/payment')
+        } catch (requestError) {
+            const responseData =
+                requestError?.response?.data
+
+            const backendError =
+                responseData?.error
+
+            if (backendError) {
+                setError(backendError)
+            } else if (
+                responseData &&
+                typeof responseData === 'object'
+            ) {
+                const firstError =
+                    Object.values(responseData)
+                        .flat()
+                        .find(
+                            (value) =>
+                                typeof value === 'string',
+                        )
+
+                setError(
+                    firstError ||
+                        'Unable to save your delivery address.',
+                )
+            } else {
+                setError(
+                    'Unable to save your delivery address. Please try again.',
+                )
+            }
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     if (cartItems.length === 0) {
         return (
             <section className="mx-auto flex min-h-[60vh] max-w-7xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
-
                 <div className="text-center">
-
                     <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
                         Checkout
                     </p>
@@ -90,20 +169,16 @@ function Checkout() {
                     >
                         Browse Products
                     </Link>
-
                 </div>
-
             </section>
         )
     }
 
     return (
         <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-
             {/* Header */}
 
             <div className="mb-10">
-
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent">
                     Checkout
                 </p>
@@ -115,17 +190,13 @@ function Checkout() {
                 <p className="mt-3 text-base text-text-secondary">
                     Enter your delivery details and review your order before payment.
                 </p>
-
             </div>
 
             <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
-
                 {/* Delivery details */}
 
                 <div className="rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
-
                     <div>
-
                         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand-accent">
                             Step 1
                         </p>
@@ -133,16 +204,13 @@ function Checkout() {
                         <h2 className="mt-2 text-2xl font-semibold text-text-primary">
                             Delivery details
                         </h2>
-
                     </div>
 
                     <form
                         onSubmit={handleSubmit}
                         className="mt-7 space-y-5"
                     >
-
                         <div>
-
                             <label
                                 htmlFor="fullName"
                                 className="block text-sm font-semibold text-text-primary"
@@ -159,11 +227,9 @@ function Checkout() {
                                 placeholder="Enter your full name"
                                 className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                             />
-
                         </div>
 
                         <div>
-
                             <label
                                 htmlFor="phone"
                                 className="block text-sm font-semibold text-text-primary"
@@ -181,11 +247,9 @@ function Checkout() {
                                 maxLength="10"
                                 className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                             />
-
                         </div>
 
                         <div>
-
                             <label
                                 htmlFor="addressLine"
                                 className="block text-sm font-semibold text-text-primary"
@@ -202,13 +266,10 @@ function Checkout() {
                                 rows="4"
                                 className="mt-2 w-full resize-none rounded-lg border border-border bg-white px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                             />
-
                         </div>
 
                         <div className="grid gap-5 sm:grid-cols-2">
-
                             <div>
-
                                 <label
                                     htmlFor="city"
                                     className="block text-sm font-semibold text-text-primary"
@@ -225,11 +286,9 @@ function Checkout() {
                                     placeholder="City"
                                     className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                                 />
-
                             </div>
 
                             <div>
-
                                 <label
                                     htmlFor="state"
                                     className="block text-sm font-semibold text-text-primary"
@@ -246,13 +305,10 @@ function Checkout() {
                                     placeholder="State"
                                     className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                                 />
-
                             </div>
-
                         </div>
 
                         <div>
-
                             <label
                                 htmlFor="pincode"
                                 className="block text-sm font-semibold text-text-primary"
@@ -271,7 +327,6 @@ function Checkout() {
                                 maxLength="6"
                                 className="mt-2 h-12 w-full rounded-lg border border-border bg-white px-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
                             />
-
                         </div>
 
                         {error && (
@@ -282,19 +337,19 @@ function Checkout() {
 
                         <button
                             type="submit"
-                            className="w-full rounded-lg bg-brand-accent px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark sm:w-auto"
+                            disabled={isSubmitting}
+                            className="w-full rounded-lg bg-brand-accent px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                         >
-                            Continue to Payment
+                            {isSubmitting
+                                ? 'Saving address...'
+                                : 'Continue to Payment'}
                         </button>
-
                     </form>
-
                 </div>
 
                 {/* Order summary */}
 
                 <aside className="h-fit rounded-2xl border border-border bg-white p-6 shadow-sm">
-
                     <p className="text-sm font-semibold uppercase tracking-[0.14em] text-brand-accent">
                         Order Summary
                     </p>
@@ -304,13 +359,11 @@ function Checkout() {
                     </h2>
 
                     <div className="mt-6 divide-y divide-border">
-
                         {cartItems.map((item) => (
                             <div
                                 key={item.id}
                                 className="flex gap-4 py-4 first:pt-0"
                             >
-
                                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-surface-soft text-center">
                                     <span className="text-xs font-medium text-text-muted">
                                         Image
@@ -318,7 +371,6 @@ function Checkout() {
                                 </div>
 
                                 <div className="min-w-0 flex-1">
-
                                     <p className="text-sm font-semibold leading-5 text-text-primary">
                                         {item.name}
                                     </p>
@@ -330,33 +382,30 @@ function Checkout() {
                                     <p className="mt-1 text-sm font-semibold text-brand-accent">
                                         ₹
                                         {(
-                                            item.price * item.quantity
+                                            item.price *
+                                            item.quantity
                                         ).toLocaleString('en-IN')}
                                     </p>
-
                                 </div>
-
                             </div>
                         ))}
-
                     </div>
 
                     <div className="mt-5 border-t border-border pt-5">
-
                         <div className="flex items-center justify-between text-sm">
-
                             <span className="text-text-secondary">
                                 Subtotal
                             </span>
 
                             <span className="font-medium text-text-primary">
-                                ₹{cartSubtotal.toLocaleString('en-IN')}
+                                ₹
+                                {cartSubtotal.toLocaleString(
+                                    'en-IN',
+                                )}
                             </span>
-
                         </div>
 
                         <div className="mt-3 flex items-center justify-between text-sm">
-
                             <span className="text-text-secondary">
                                 Delivery
                             </span>
@@ -366,21 +415,20 @@ function Checkout() {
                                     ? 'FREE'
                                     : `₹${deliveryCharge}`}
                             </span>
-
                         </div>
 
                         <div className="mt-5 flex items-center justify-between border-t border-border pt-5">
-
                             <span className="text-base font-semibold text-text-primary">
                                 Total
                             </span>
 
                             <span className="text-xl font-bold text-text-primary">
-                                ₹{orderTotal.toLocaleString('en-IN')}
+                                ₹
+                                {orderTotal.toLocaleString(
+                                    'en-IN',
+                                )}
                             </span>
-
                         </div>
-
                     </div>
 
                     <Link
@@ -389,11 +437,8 @@ function Checkout() {
                     >
                         ← Back to cart
                     </Link>
-
                 </aside>
-
             </div>
-
         </section>
     )
 }

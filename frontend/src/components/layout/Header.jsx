@@ -1,12 +1,26 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import {
+  useEffect,
+  useState,
+} from 'react'
+
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom'
 
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 
 function Header() {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] =
+    useState('')
+
+  const [
+    searchParams,
+    setSearchParams,
+  ] = useSearchParams()
 
   const navigate = useNavigate()
 
@@ -14,23 +28,82 @@ function Header() {
     isAuthenticated,
   } = useAuth()
 
-  const { cartCount } = useCart()
+  const { cartCount } =
+    useCart()
 
-  const { wishlistCount } = useWishlist()
+  const { wishlistCount } =
+    useWishlist()
 
-  const handleSearch = (event) => {
+  const urlSearchQuery =
+    searchParams.get('search') || ''
+
+  useEffect(() => {
+    setSearchQuery(
+      urlSearchQuery,
+    )
+  }, [urlSearchQuery])
+
+  const handleSearch = (
+    event,
+  ) => {
     event.preventDefault()
 
     const trimmedQuery =
       searchQuery.trim()
 
+    const nextParams =
+      new URLSearchParams(
+        searchParams,
+      )
+
     if (!trimmedQuery) {
+      nextParams.delete(
+        'search',
+      )
+
+      setSearchParams(
+        nextParams,
+      )
+
       return
     }
 
-    navigate(
-      `/products?search=${encodeURIComponent(trimmedQuery)}`,
+    nextParams.set(
+      'search',
+      trimmedQuery,
     )
+
+    setSearchParams(
+      nextParams,
+    )
+
+    navigate(
+      `/products?${nextParams.toString()}`,
+    )
+  }
+
+  const handleSearchChange = (
+    event,
+  ) => {
+    const value =
+      event.target.value
+
+    setSearchQuery(value)
+
+    if (!value.trim()) {
+      const nextParams =
+        new URLSearchParams(
+          searchParams,
+        )
+
+      nextParams.delete(
+        'search',
+      )
+
+      setSearchParams(
+        nextParams,
+      )
+    }
   }
 
   return (
@@ -48,7 +121,9 @@ function Header() {
           </Link>
 
           <form
-            onSubmit={handleSearch}
+            onSubmit={
+              handleSearch
+            }
             className="hidden min-w-0 flex-1 md:block"
           >
             <label
@@ -63,11 +138,11 @@ function Header() {
               <input
                 id="header-search"
                 type="search"
-                value={searchQuery}
-                onChange={(event) =>
-                  setSearchQuery(
-                    event.target.value,
-                  )
+                value={
+                  searchQuery
+                }
+                onChange={
+                  handleSearchChange
                 }
                 placeholder="Search products, brands and categories"
                 className="h-11 w-full rounded-lg border border-white/15 bg-white px-4 text-sm text-[#202124] outline-none placeholder:text-gray-500 transition focus:border-[#d97736] focus:ring-2 focus:ring-[#d97736]/30"

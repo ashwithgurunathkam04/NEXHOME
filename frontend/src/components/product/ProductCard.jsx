@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
+import { useAuth } from '@/context/AuthContext'
 
 const imageExtensions = [
   '.jpg',
@@ -12,7 +13,10 @@ const imageExtensions = [
   '.avif',
 ]
 
-function getNextImagePath(currentPath, extensionIndex) {
+function getNextImagePath(
+  currentPath,
+  extensionIndex,
+) {
   const pathWithoutExtension =
     currentPath.replace(
       /\.(jpg|jpeg|png|webp|avif)$/i,
@@ -31,17 +35,35 @@ function getNextImagePath(currentPath, extensionIndex) {
 
 function ProductCard({ product }) {
   const { addToCart } = useCart()
-  const { isInWishlist, toggleWishlist } = useWishlist()
 
-  const [imageSrc, setImageSrc] = useState(
-    product.image,
-  )
+  const {
+    isInWishlist,
+    toggleWishlist,
+  } = useWishlist()
 
-  const [imageExtensionIndex, setImageExtensionIndex] =
-    useState(0)
+  const {
+    isAuthenticated,
+  } = useAuth()
+
+  const [imageSrc, setImageSrc] =
+    useState(
+      product.image,
+    )
+
+  const [
+    imageExtensionIndex,
+    setImageExtensionIndex,
+  ] = useState(0)
+
+  const [cartMessage, setCartMessage] =
+    useState('')
+
+  const [cartMessageType, setCartMessageType] =
+    useState('')
 
   const discount = Math.round(
-    ((product.originalPrice - product.price) /
+    ((product.originalPrice -
+      product.price) /
       product.originalPrice) *
     100,
   )
@@ -50,10 +72,27 @@ function ProductCard({ product }) {
     isInWishlist(product.id)
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      setCartMessage(
+        'Please log in to add items to your cart.',
+      )
+
+      setCartMessageType(
+        'login',
+      )
+
+      return
+    }
+
+    setCartMessage('Added to cart successfully.')
+    setCartMessageType('success')
+
     addToCart(product)
   }
 
-  const handleWishlistToggle = (event) => {
+  const handleWishlistToggle = (
+    event,
+  ) => {
     event.preventDefault()
     event.stopPropagation()
 
@@ -71,15 +110,22 @@ function ProductCard({ product }) {
       )
 
     if (nextImagePath) {
-      setImageExtensionIndex(nextIndex)
-      setImageSrc(nextImagePath)
+      setImageExtensionIndex(
+        nextIndex,
+      )
+
+      setImageSrc(
+        nextImagePath,
+      )
     }
   }
 
   return (
     <article className="group overflow-hidden rounded-2xl border-2 border-brand-accent bg-[#263238] text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
 
-      <Link to={`/products/${product.id}`}>
+      <Link
+        to={`/products/${product.id}`}
+      >
 
         <div className="relative h-72 w-full overflow-hidden bg-[#f5f2ec]">
 
@@ -97,16 +143,19 @@ function ProductCard({ product }) {
 
           <button
             type="button"
-            onClick={handleWishlistToggle}
+            onClick={
+              handleWishlistToggle
+            }
             aria-label={
               productInWishlist
                 ? 'Remove product from wishlist'
                 : 'Add product to wishlist'
             }
-            className={`absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border bg-white text-xl shadow-md transition ${productInWishlist
+            className={`absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center rounded-full border bg-white text-xl shadow-md transition ${
+              productInWishlist
                 ? 'border-brand-accent text-brand-accent'
                 : 'border-border text-text-primary hover:border-brand-accent hover:text-brand-accent'
-              }`}
+            }`}
           >
             {productInWishlist
               ? '♥'
@@ -161,9 +210,37 @@ function ProductCard({ product }) {
 
       <div className="px-6 pb-6">
 
+        {cartMessage && (
+          <div
+            className={`mb-3 rounded-lg border px-3 py-2.5 text-center text-xs font-medium ${
+              cartMessageType ===
+              'success'
+                ? 'border-green-400/30 bg-green-400/10 text-green-300'
+                : 'border-brand-accent/40 bg-brand-accent/10 text-brand-accent'
+            }`}
+          >
+            {cartMessage}
+
+            {cartMessageType ===
+              'login' && (
+              <Link
+                to="/login"
+                className="ml-1 font-bold underline underline-offset-2 hover:text-white"
+                onClick={() =>
+                  setCartMessage('')
+                }
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
+        )}
+
         <button
           type="button"
-          onClick={handleAddToCart}
+          onClick={
+            handleAddToCart
+          }
           className="w-full rounded-lg bg-brand-accent px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-brand-accent-dark hover:shadow-lg"
         >
           Add to Cart

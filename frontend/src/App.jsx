@@ -17,11 +17,14 @@ import OrderSuccess from '@/pages/OrderSuccess'
 import Orders from '@/pages/Orders'
 import OrderDetails from '@/pages/OrderDetails'
 
+import AdminDashboard from '@/admin/pages/AdminDashboard'
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
+        {/* Customer Application */}
         <Route element={<MainLayout />}>
 
           <Route
@@ -95,6 +98,12 @@ function App() {
           />
 
         </Route>
+
+        {/* Admin Application */}
+        <Route
+          path="/admin"
+          element={<AdminDashboard />}
+        />
 
       </Routes>
     </BrowserRouter>

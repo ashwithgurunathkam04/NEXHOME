@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import Address
 
@@ -47,7 +49,25 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
+            "is_staff",
         ]
+
+
+class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        login_value = attrs.get("username")
+
+        if "@" in login_value:
+            try:
+                user = User.objects.get(email__iexact=login_value)
+            except User.DoesNotExist:
+                raise AuthenticationFailed(
+                    "No active account found with the given credentials."
+                )
+
+            attrs["username"] = user.username
+
+        return super().validate(attrs)
 
 
 class AddressSerializer(serializers.ModelSerializer):

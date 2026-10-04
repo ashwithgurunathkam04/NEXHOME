@@ -31,6 +31,8 @@ function AuthProvider({ children }) {
             try {
                 const profile =
                     await getProfile()
+                
+                console.log('NEXHOME PROFILE:', profile)
 
                 setUser(profile)
             } catch (error) {
