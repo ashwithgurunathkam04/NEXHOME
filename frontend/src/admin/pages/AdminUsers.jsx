@@ -1,35 +1,69 @@
 import { useEffect, useState } from 'react'
 
-import { getAdminUsers } from '@/services/adminUserService'
+import {
+    getAdminUsers,
+    updateAdminUser,
+} from '@/services/adminUserService'
 
 function AdminUsers() {
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [updatingUserId, setUpdatingUserId] =
+        useState(null)
+
+    const loadUsers = async () => {
+        try {
+            setError('')
+
+            const data = await getAdminUsers()
+
+            setUsers(
+                Array.isArray(data)
+                    ? data
+                    : data.results || [],
+            )
+        } catch (error) {
+            console.error(
+                'Failed to load admin users:',
+                error,
+            )
+            setError('Failed to load users.')
+        } finally {
+            setLoading(false)
+        }
+    }
 
     useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const data = await getAdminUsers()
-
-                setUsers(
-                    Array.isArray(data)
-                        ? data
-                        : data.results || [],
-                )
-            } catch (error) {
-                console.error(
-                    'Failed to load admin users:',
-                    error,
-                )
-                setError('Failed to load users.')
-            } finally {
-                setLoading(false)
-            }
-        }
-
         loadUsers()
     }, [])
+
+    const handleStatusChange = async (
+        userId,
+        isActive,
+    ) => {
+        try {
+            setError('')
+            setUpdatingUserId(userId)
+
+            await updateAdminUser(userId, {
+                is_active: isActive,
+            })
+
+            await loadUsers()
+        } catch (error) {
+            console.error(
+                'Failed to update user status:',
+                error,
+            )
+
+            setError(
+                'Failed to update user status. Please try again.',
+            )
+        } finally {
+            setUpdatingUserId(null)
+        }
+    }
 
     if (loading) {
         return (
@@ -41,7 +75,7 @@ function AdminUsers() {
         )
     }
 
-    if (error) {
+    if (error && users.length === 0) {
         return (
             <div className="p-6 lg:p-8">
                 <p className="text-sm text-red-600">
@@ -66,6 +100,14 @@ function AdminUsers() {
                     View and manage NEXHOME customer accounts.
                 </p>
             </div>
+
+            {error && (
+                <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                    <p className="text-sm text-red-600">
+                        {error}
+                    </p>
+                </div>
+            )}
 
             <div className="mt-8 overflow-hidden rounded-xl border border-border bg-white">
                 <div className="overflow-x-auto">
@@ -123,17 +165,45 @@ function AdminUsers() {
                                     </td>
 
                                     <td className="px-5 py-4">
-                                        <span
-                                            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                                        <select
+                                            value={
                                                 user.is_active
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-red-100 text-red-700'
+                                                    ? 'active'
+                                                    : 'inactive'
+                                            }
+                                            disabled={
+                                                updatingUserId ===
+                                                user.id
+                                            }
+                                            onChange={(event) =>
+                                                handleStatusChange(
+                                                    user.id,
+                                                    event.target
+                                                        .value ===
+                                                        'active',
+                                                )
+                                            }
+                                            className={`rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium outline-none transition focus:border-brand-accent ${
+                                                user.is_active
+                                                    ? 'text-green-700'
+                                                    : 'text-red-700'
                                             }`}
                                         >
-                                            {user.is_active
-                                                ? 'Active'
-                                                : 'Inactive'}
-                                        </span>
+                                            <option value="active">
+                                                Active
+                                            </option>
+
+                                            <option value="inactive">
+                                                Inactive
+                                            </option>
+                                        </select>
+
+                                        {updatingUserId ===
+                                            user.id && (
+                                            <p className="mt-1 text-xs text-text-secondary">
+                                                Updating...
+                                            </p>
+                                        )}
                                     </td>
 
                                     <td className="px-5 py-4 text-sm text-text-secondary">

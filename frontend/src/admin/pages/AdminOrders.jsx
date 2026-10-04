@@ -1,35 +1,76 @@
 import { useEffect, useState } from 'react'
 
-import { getAdminOrders } from '@/services/adminOrderService'
+import {
+    getAdminOrders,
+    updateAdminOrder,
+} from '@/services/adminOrderService'
+
+const ORDER_STATUSES = [
+    'pending',
+    'confirmed',
+    'shipped',
+    'delivered',
+    'cancelled',
+]
 
 function AdminOrders() {
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [updatingOrderId, setUpdatingOrderId] =
+        useState(null)
+
+    const loadOrders = async () => {
+        try {
+            setError('')
+
+            const data = await getAdminOrders()
+
+            setOrders(
+                Array.isArray(data)
+                    ? data
+                    : data.results || [],
+            )
+        } catch (error) {
+            console.error(
+                'Failed to load admin orders:',
+                error,
+            )
+            setError('Failed to load orders.')
+        } finally {
+            setLoading(false)
+        }
+    }
 
     useEffect(() => {
-        const loadOrders = async () => {
-            try {
-                const data = await getAdminOrders()
-
-                setOrders(
-                    Array.isArray(data)
-                        ? data
-                        : data.results || [],
-                )
-            } catch (error) {
-                console.error(
-                    'Failed to load admin orders:',
-                    error,
-                )
-                setError('Failed to load orders.')
-            } finally {
-                setLoading(false)
-            }
-        }
-
         loadOrders()
     }, [])
+
+    const handleStatusChange = async (
+        orderId,
+        newStatus,
+    ) => {
+        try {
+            setError('')
+            setUpdatingOrderId(orderId)
+
+            await updateAdminOrder(orderId, {
+                status: newStatus,
+            })
+
+            await loadOrders()
+        } catch (error) {
+            console.error(
+                'Failed to update order status:',
+                error,
+            )
+            setError(
+                'Failed to update order status. Please try again.',
+            )
+        } finally {
+            setUpdatingOrderId(null)
+        }
+    }
 
     if (loading) {
         return (
@@ -41,7 +82,7 @@ function AdminOrders() {
         )
     }
 
-    if (error) {
+    if (error && orders.length === 0) {
         return (
             <div className="p-6 lg:p-8">
                 <p className="text-sm text-red-600">
@@ -66,6 +107,14 @@ function AdminOrders() {
                     View and manage customer orders.
                 </p>
             </div>
+
+            {error && (
+                <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                    <p className="text-sm text-red-600">
+                        {error}
+                    </p>
+                </div>
+            )}
 
             <div className="mt-8 overflow-hidden rounded-xl border border-border bg-white">
                 <div className="overflow-x-auto">
@@ -159,19 +208,60 @@ function AdminOrders() {
                                     </td>
 
                                     <td className="px-5 py-4">
-                                        <span
-                                            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                                        <select
+                                            value={
+                                                order.status ||
+                                                'pending'
+                                            }
+                                            onChange={(event) =>
+                                                handleStatusChange(
+                                                    order.id,
+                                                    event.target.value,
+                                                )
+                                            }
+                                            disabled={
+                                                updatingOrderId ===
+                                                order.id
+                                            }
+                                            className={`rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium outline-none transition focus:border-brand-accent ${
                                                 order.status ===
                                                 'delivered'
-                                                    ? 'bg-green-100 text-green-700'
+                                                    ? 'text-green-700'
                                                     : order.status ===
                                                         'cancelled'
-                                                      ? 'bg-red-100 text-red-700'
-                                                      : 'bg-yellow-100 text-yellow-700'
+                                                      ? 'text-red-700'
+                                                      : order.status ===
+                                                          'shipped'
+                                                        ? 'text-blue-700'
+                                                        : order.status ===
+                                                            'confirmed'
+                                                          ? 'text-brand-accent'
+                                                          : 'text-yellow-700'
                                             }`}
                                         >
-                                            {order.status || 'Pending'}
-                                        </span>
+                                            {ORDER_STATUSES.map(
+                                                (status) => (
+                                                    <option
+                                                        key={status}
+                                                        value={status}
+                                                    >
+                                                        {status
+                                                            .charAt(0)
+                                                            .toUpperCase() +
+                                                            status.slice(
+                                                                1,
+                                                            )}
+                                                    </option>
+                                                ),
+                                            )}
+                                        </select>
+
+                                        {updatingOrderId ===
+                                            order.id && (
+                                            <p className="mt-1 text-xs text-text-secondary">
+                                                Updating...
+                                            </p>
+                                        )}
                                     </td>
 
                                     <td className="px-5 py-4 text-sm text-text-secondary">

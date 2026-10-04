@@ -69,7 +69,7 @@ function AdminPayments() {
 
             <div className="mt-8 overflow-hidden rounded-xl border border-border bg-white">
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[1000px] text-left">
+                    <table className="w-full min-w-[1150px] text-left">
                         <thead className="border-b border-border bg-surface">
                             <tr>
                                 <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-text-secondary">
@@ -94,6 +94,10 @@ function AdminPayments() {
 
                                 <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-text-secondary">
                                     Status
+                                </th>
+
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                                    Date
                                 </th>
                             </tr>
                         </thead>
@@ -149,7 +153,7 @@ function AdminPayments() {
 
                                     <td className="px-5 py-4">
                                         <span
-                                            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                                            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium capitalize ${
                                                 payment.status ===
                                                 'success'
                                                     ? 'bg-green-100 text-green-700'
@@ -162,6 +166,16 @@ function AdminPayments() {
                                             {payment.status ||
                                                 'Pending'}
                                         </span>
+                                    </td>
+
+                                    <td className="px-5 py-4 text-sm text-text-secondary">
+                                        {payment.created_at
+                                            ? new Date(
+                                                  payment.created_at,
+                                              ).toLocaleString(
+                                                  'en-IN',
+                                              )
+                                            : '-'}
                                     </td>
                                 </tr>
                             ))}

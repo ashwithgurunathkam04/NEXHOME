@@ -23,3 +23,15 @@ export const updateAdminCategory = async (
     )
     return response.data
 }
+
+export const deactivateAdminCategory = async (
+    categoryId,
+) => {
+    const response = await api.patch(
+        `/admin/categories/${categoryId}/`,
+        {
+            is_active: false,
+        },
+    )
+    return response.data
+}

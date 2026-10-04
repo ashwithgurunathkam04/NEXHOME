@@ -23,3 +23,15 @@ export const updateAdminProduct = async (
     )
     return response.data
 }
+
+export const deactivateAdminProduct = async (
+    productId,
+) => {
+    const response = await api.patch(
+        `/admin/products/${productId}/`,
+        {
+            is_active: false,
+        },
+    )
+    return response.data
+}

@@ -1,53 +1,135 @@
 import { useEffect, useState } from 'react'
 
-import { getAdminCategories } from '@/services/adminCategoryService'
+import CategoryForm from '@/admin/components/CategoryForm'
+import {
+    createAdminCategory,
+    deactivateAdminCategory,
+    getAdminCategories,
+    updateAdminCategory,
+} from '@/services/adminCategoryService'
 
 function AdminCategories() {
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
 
-    useEffect(() => {
-        const loadCategories = async () => {
-            try {
-                const data = await getAdminCategories()
+    const [showForm, setShowForm] = useState(false)
+    const [editingCategory, setEditingCategory] =
+        useState(null)
 
-                setCategories(
-                    Array.isArray(data)
-                        ? data
-                        : data.results || [],
-                )
-            } catch (error) {
-                console.error(
-                    'Failed to load admin categories:',
-                    error,
-                )
-                setError(
-                    'Failed to load categories.',
-                )
-            } finally {
-                setLoading(false)
-            }
+    const [submitting, setSubmitting] =
+        useState(false)
+
+    const loadCategories = async () => {
+        try {
+            setLoading(true)
+            setError('')
+
+            const data = await getAdminCategories()
+
+            setCategories(
+                Array.isArray(data)
+                    ? data
+                    : data.results || [],
+            )
+        } catch (error) {
+            console.error(
+                'Failed to load admin categories:',
+                error,
+            )
+
+            setError('Failed to load categories.')
+        } finally {
+            setLoading(false)
         }
+    }
 
+    useEffect(() => {
         loadCategories()
     }, [])
+
+    const handleAddCategory = () => {
+        setEditingCategory(null)
+        setShowForm(true)
+    }
+
+    const handleEditCategory = (category) => {
+        setEditingCategory(category)
+        setShowForm(true)
+    }
+
+    const handleSubmit = async (formData) => {
+        try {
+            setSubmitting(true)
+            setError('')
+
+            if (editingCategory) {
+                await updateAdminCategory(
+                    editingCategory.id,
+                    formData,
+                )
+            } else {
+                await createAdminCategory(formData)
+            }
+
+            setShowForm(false)
+            setEditingCategory(null)
+
+            await loadCategories()
+        } catch (error) {
+            console.error(
+                'Failed to save category:',
+                error,
+            )
+
+            setError(
+                error?.response?.data
+                    ? JSON.stringify(
+                          error.response.data,
+                      )
+                    : 'Failed to save category.',
+            )
+        } finally {
+            setSubmitting(false)
+        }
+    }
+
+    const handleDeactivateCategory = async (category) => {
+    const confirmed = window.confirm(
+        `Deactivate "${category.name}"?`,
+    )
+
+    if (!confirmed) {
+        return
+    }
+
+    try {
+        setError('')
+
+        await deactivateAdminCategory(category.id)
+
+        await loadCategories()
+    } catch (error) {
+        console.error(
+            'Failed to deactivate category:',
+            error,
+        )
+
+        setError(
+            error?.response?.data
+                ? JSON.stringify(
+                      error.response.data,
+                  )
+                : 'Failed to deactivate category.',
+        )
+    }
+}
 
     if (loading) {
         return (
             <div className="flex min-h-screen items-center justify-center">
                 <p className="text-sm text-text-secondary">
                     Loading categories...
-                </p>
-            </div>
-        )
-    }
-
-    if (error) {
-        return (
-            <div className="p-6 lg:p-8">
-                <p className="text-sm text-red-600">
-                    {error}
                 </p>
             </div>
         )
@@ -72,15 +154,24 @@ function AdminCategories() {
 
                 <button
                     type="button"
+                    onClick={handleAddCategory}
                     className="rounded-lg bg-brand-accent px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90"
                 >
                     Add Category
                 </button>
             </div>
 
+            {error && (
+                <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                    <p className="text-sm text-red-600">
+                        {error}
+                    </p>
+                </div>
+            )}
+
             <div className="mt-8 overflow-hidden rounded-xl border border-border bg-white">
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[700px] text-left">
+                    <table className="w-full min-w-[800px] text-left">
                         <thead className="border-b border-border bg-surface">
                             <tr>
                                 <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-text-secondary">
@@ -97,6 +188,10 @@ function AdminCategories() {
 
                                 <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-text-secondary">
                                     Status
+                                </th>
+
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                                    Action
                                 </th>
                             </tr>
                         </thead>
@@ -122,7 +217,8 @@ function AdminCategories() {
                                     </td>
 
                                     <td className="px-5 py-4 text-sm text-text-primary">
-                                        {category.product_count ?? 0}
+                                        {category.product_count ??
+                                            0}
                                     </td>
 
                                     <td className="px-5 py-4">
@@ -138,6 +234,32 @@ function AdminCategories() {
                                                 : 'Inactive'}
                                         </span>
                                     </td>
+
+                                  <td className="px-5 py-4">
+    <div className="flex items-center gap-3">
+        <button
+            type="button"
+            onClick={() => handleEditCategory(category)}
+            className="text-sm font-medium text-brand-accent hover:underline"
+        >
+            Edit
+        </button>
+
+        {category.is_active ? (
+            <button
+                type="button"
+                onClick={() => handleDeactivateCategory(category)}
+                className="text-sm font-medium text-red-600 hover:underline"
+            >
+                Deactivate
+            </button>
+        ) : (
+            <span className="text-sm font-medium text-text-secondary">
+                Inactive
+            </span>
+        )}
+    </div>
+</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -152,6 +274,18 @@ function AdminCategories() {
                     </div>
                 )}
             </div>
+
+            {showForm && (
+                <CategoryForm
+                    category={editingCategory}
+                    onSubmit={handleSubmit}
+                    onCancel={() => {
+                        setShowForm(false)
+                        setEditingCategory(null)
+                    }}
+                    submitting={submitting}
+                />
+            )}
         </div>
     )
 }
