@@ -1,6 +1,12 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-
+import AdminRoute from '@/admin/components/AdminRoute'
+import AdminLayout from '@/admin/components/AdminLayout'
 import MainLayout from '@/components/layout/MainLayout'
+import AdminProducts from '@/admin/pages/AdminProducts'
+import AdminCategories from '@/admin/pages/AdminCategories'
+import AdminOrders from '@/admin/pages/AdminOrders'
+import AdminUsers from '@/admin/pages/AdminUsers'
+import AdminPayments from '@/admin/pages/AdminPayments'
 
 import Home from '@/pages/Home'
 import Products from '@/pages/Products'
@@ -99,11 +105,34 @@ function App() {
 
         </Route>
 
-        {/* Admin Application */}
-        <Route
-          path="/admin"
-          element={<AdminDashboard />}
-        />
+<Route element={<AdminRoute />}>
+  <Route element={<AdminLayout />}>
+  <Route
+    path="/admin/payments"
+    element={<AdminPayments />}
+/>
+  <Route
+    path="/admin/users"
+    element={<AdminUsers />}
+/>
+  <Route
+    path="/admin/orders"
+    element={<AdminOrders />}
+/>
+  <Route
+    path="/admin/categories"
+    element={<AdminCategories />}
+/>
+  <Route
+    path="/admin/products"
+    element={<AdminProducts />}
+/>
+    <Route
+      path="/admin"
+      element={<AdminDashboard />}
+    />
+  </Route>
+</Route>
 
       </Routes>
     </BrowserRouter>
