@@ -1,15 +1,28 @@
-import { Link, useParams } from 'react-router-dom'
+import {
+  useEffect,
+  useState,
+} from 'react'
 
-import products from '@/data/products'
+import {
+  Link,
+  useParams,
+} from 'react-router-dom'
+
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
+import { getProductById } from '@/services/productService'
 
 function ProductDetails() {
   const { id } = useParams()
 
-  const product = products.find(
-    (item) => String(item.id) === String(id)
-  )
+  const [product, setProduct] =
+    useState(null)
+
+  const [loading, setLoading] =
+    useState(true)
+
+  const [error, setError] =
+    useState('')
 
   const { addToCart } = useCart()
 
@@ -18,7 +31,52 @@ function ProductDetails() {
     toggleWishlist,
   } = useWishlist()
 
-  if (!product) {
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        setLoading(true)
+        setError('')
+
+        const data =
+          await getProductById(id)
+
+        setProduct(data)
+      } catch (error) {
+        console.error(
+          'Failed to load product:',
+          error,
+        )
+
+        setProduct(null)
+
+        setError(
+          'Unable to load this product. Please try again.',
+        )
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadProduct()
+  }, [id])
+
+  if (loading) {
+    return (
+      <section className="mx-auto flex min-h-[60vh] max-w-7xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
+        <div className="text-center">
+
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-border border-t-brand-accent" />
+
+          <p className="mt-4 text-sm font-medium text-text-secondary">
+            Loading product...
+          </p>
+
+        </div>
+      </section>
+    )
+  }
+
+  if (error || !product) {
     return (
       <section className="mx-auto flex min-h-[60vh] max-w-7xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center">
@@ -28,11 +86,14 @@ function ProductDetails() {
           </p>
 
           <h1 className="mt-3 text-3xl font-semibold text-text-primary">
-            We couldn't find that product.
+            {error
+              ? 'Unable to load product.'
+              : "We couldn't find that product."}
           </h1>
 
           <p className="mt-3 text-text-secondary">
-            The product may have been removed or the link may be incorrect.
+            {error ||
+              'The product may have been removed or the link may be incorrect.'}
           </p>
 
           <Link
@@ -47,11 +108,15 @@ function ProductDetails() {
     )
   }
 
-  const discount = Math.round(
-    ((product.originalPrice - product.price) /
-      product.originalPrice) *
-      100,
-  )
+  const discount =
+    product.originalPrice > 0
+      ? Math.round(
+        ((product.originalPrice -
+          product.price) /
+          product.originalPrice) *
+        100,
+      )
+      : 0
 
   const productInWishlist =
     isInWishlist(product.id)
@@ -68,6 +133,7 @@ function ProductDetails() {
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
 
       <div className="mb-8 flex flex-wrap items-center gap-2 text-sm text-text-secondary">
+
         <Link
           to="/"
           className="transition-colors hover:text-brand-accent"
@@ -89,6 +155,7 @@ function ProductDetails() {
         <span className="text-text-primary">
           {product.name}
         </span>
+
       </div>
 
       <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
@@ -99,17 +166,27 @@ function ProductDetails() {
 
           <div className="relative flex min-h-[480px] items-center justify-center bg-[#f5f2ec] p-10">
 
-            <span className="absolute left-6 top-6 rounded-md bg-brand-accent px-3 py-1.5 text-xs font-bold text-white">
-              {discount}% OFF
-            </span>
+            {discount > 0 && (
+              <span className="absolute left-6 top-6 z-10 rounded-md bg-brand-accent px-3 py-1.5 text-xs font-bold text-white">
+                {discount}% OFF
+              </span>
+            )}
 
-            <div className="flex h-full min-h-[400px] w-full items-center justify-center text-center">
+            {product.image ? (
+              <img
+                src={product.image}
+                alt={product.name}
+                className="h-full max-h-[480px] w-full object-contain"
+              />
+            ) : (
+              <div className="flex h-[400px] w-full items-center justify-center text-center">
 
-              <p className="max-w-xs text-sm font-medium text-text-secondary">
-                Product image will be added later
-              </p>
+                <p className="max-w-xs text-sm font-medium text-text-secondary">
+                  Product image not available
+                </p>
 
-            </div>
+              </div>
+            )}
 
           </div>
 
@@ -143,27 +220,59 @@ function ProductDetails() {
               </span>
             )}
 
+            {product.stock <= 0 && (
+              <span className="rounded-md bg-red-50 px-3 py-1.5 text-sm font-semibold text-danger">
+                Out of stock
+              </span>
+            )}
+
           </div>
 
           <div className="mt-8 flex items-baseline gap-4">
 
             <span className="text-4xl font-bold tracking-tight text-text-primary">
-              ₹{product.price.toLocaleString('en-IN')}
+              ₹
+              {product.price.toLocaleString(
+                'en-IN',
+              )}
             </span>
 
-            <span className="text-lg text-text-muted line-through">
-              ₹{product.originalPrice.toLocaleString('en-IN')}
-            </span>
+            {product.originalPrice >
+              product.price && (
+                <span className="text-lg text-text-muted line-through">
+                  ₹
+                  {product.originalPrice.toLocaleString(
+                    'en-IN',
+                  )}
+                </span>
+              )}
 
           </div>
 
-          <p className="mt-2 text-sm font-semibold text-brand-accent">
-            Save ₹
-            {(
-              product.originalPrice -
-              product.price
-            ).toLocaleString('en-IN')}
-          </p>
+          {product.originalPrice >
+            product.price && (
+              <p className="mt-2 text-sm font-semibold text-brand-accent">
+                Save ₹
+                {(
+                  product.originalPrice -
+                  product.price
+                ).toLocaleString('en-IN')}
+              </p>
+            )}
+
+          {product.description && (
+            <div className="mt-8 border-t border-border pt-8">
+
+              <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-text-primary">
+                Description
+              </h2>
+
+              <p className="mt-4 text-sm leading-7 text-text-secondary">
+                {product.description}
+              </p>
+
+            </div>
+          )}
 
           <div className="mt-8 border-t border-border pt-8">
 
@@ -174,6 +283,7 @@ function ProductDetails() {
             <dl className="mt-5 space-y-4">
 
               <div className="flex justify-between gap-6 border-b border-border pb-4">
+
                 <dt className="text-sm text-text-secondary">
                   Category
                 </dt>
@@ -181,9 +291,11 @@ function ProductDetails() {
                 <dd className="text-right text-sm font-medium text-text-primary">
                   {product.category}
                 </dd>
+
               </div>
 
               <div className="flex justify-between gap-6 border-b border-border pb-4">
+
                 <dt className="text-sm text-text-secondary">
                   Brand
                 </dt>
@@ -191,9 +303,11 @@ function ProductDetails() {
                 <dd className="text-right text-sm font-medium text-text-primary">
                   {product.brand}
                 </dd>
+
               </div>
 
               <div className="flex justify-between gap-6">
+
                 <dt className="text-sm text-text-secondary">
                   Availability
                 </dt>
@@ -203,6 +317,7 @@ function ProductDetails() {
                     ? `${product.stock} units available`
                     : 'Out of stock'}
                 </dd>
+
               </div>
 
             </dl>
@@ -214,7 +329,9 @@ function ProductDetails() {
             <button
               type="button"
               onClick={handleAddToCart}
-              disabled={product.stock <= 0}
+              disabled={
+                product.stock <= 0
+              }
               className="flex-1 rounded-lg bg-brand-accent px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
               Add to Cart
@@ -222,12 +339,13 @@ function ProductDetails() {
 
             <button
               type="button"
-              onClick={handleWishlistToggle}
-              className={`rounded-lg border px-6 py-3.5 text-sm font-semibold transition-colors ${
-                productInWishlist
+              onClick={
+                handleWishlistToggle
+              }
+              className={`rounded-lg border px-6 py-3.5 text-sm font-semibold transition-colors ${productInWishlist
                   ? 'border-brand-accent bg-brand-accent text-white'
                   : 'border-border-strong bg-white text-text-primary hover:border-brand-accent hover:text-brand-accent'
-              }`}
+                }`}
             >
               {productInWishlist
                 ? 'Remove from Wishlist'

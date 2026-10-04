@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 
@@ -9,6 +10,10 @@ function Header() {
 
   const navigate = useNavigate()
 
+  const {
+    isAuthenticated,
+  } = useAuth()
+
   const { cartCount } = useCart()
 
   const { wishlistCount } = useWishlist()
@@ -16,23 +21,22 @@ function Header() {
   const handleSearch = (event) => {
     event.preventDefault()
 
-    const trimmedQuery = searchQuery.trim()
+    const trimmedQuery =
+      searchQuery.trim()
 
     if (!trimmedQuery) {
       return
     }
 
     navigate(
-      `/products?search=${encodeURIComponent(trimmedQuery)}`
+      `/products?search=${encodeURIComponent(trimmedQuery)}`,
     )
   }
 
   return (
-    <header className="bg-brand-dark text-white shadow-sm">
+    <header className="bg-[#202124] text-white shadow-sm">
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
-        {/* Main header */}
 
         <div className="flex min-h-20 items-center gap-6">
 
@@ -40,7 +44,7 @@ function Header() {
             to="/"
             className="shrink-0 text-2xl font-bold tracking-[-0.04em] text-white"
           >
-            NEX<span className="text-brand-accent">HOME</span>
+            NEX<span className="text-[#d97736]">HOME</span>
           </Link>
 
           <form
@@ -61,10 +65,12 @@ function Header() {
                 type="search"
                 value={searchQuery}
                 onChange={(event) =>
-                  setSearchQuery(event.target.value)
+                  setSearchQuery(
+                    event.target.value,
+                  )
                 }
                 placeholder="Search products, brands and categories"
-                className="h-11 w-full rounded-lg border border-white/15 bg-white px-4 text-sm text-brand-dark outline-none placeholder:text-gray-500 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/30"
+                className="h-11 w-full rounded-lg border border-white/15 bg-white px-4 text-sm text-[#202124] outline-none placeholder:text-gray-500 transition focus:border-[#d97736] focus:ring-2 focus:ring-[#d97736]/30"
               />
 
             </div>
@@ -73,8 +79,6 @@ function Header() {
 
           <div className="ml-auto flex shrink-0 items-center gap-6">
 
-            {/* Wishlist */}
-
             <Link
               to="/wishlist"
               className="hidden items-center gap-2 text-sm font-medium text-white/80 transition-colors hover:text-white lg:flex"
@@ -82,14 +86,12 @@ function Header() {
               Wishlist
 
               {wishlistCount > 0 && (
-                <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-brand-accent px-1.5 py-0.5 text-xs font-bold text-white">
+                <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-[#d97736] px-1.5 py-0.5 text-xs font-bold text-white">
                   {wishlistCount}
                 </span>
               )}
 
             </Link>
-
-            {/* Orders */}
 
             <Link
               to="/orders"
@@ -98,36 +100,38 @@ function Header() {
               Orders
             </Link>
 
-            {/* Account */}
-
-            <Link
-              to="/account"
-              className="hidden text-sm font-medium text-white/80 transition-colors hover:text-white sm:block"
-            >
-              Account
-            </Link>
-
-            {/* Cart */}
+            {isAuthenticated ? (
+              <Link
+                to="/account"
+                className="hidden text-sm font-medium text-white/80 transition-colors hover:text-white sm:block"
+              >
+                Account
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden text-sm font-medium text-white/80 transition-colors hover:text-white sm:block"
+              >
+                Sign In
+              </Link>
+            )}
 
             <Link
               to="/cart"
-              className="relative rounded-md bg-brand-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
+              className="relative rounded-md bg-[#d97736] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#b85d24]"
             >
               Bag
 
               {cartCount > 0 && (
-                <span className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-bold text-brand-dark">
+                <span className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-xs font-bold text-[#202124]">
                   {cartCount}
                 </span>
               )}
-
             </Link>
 
           </div>
 
         </div>
-
-        {/* Category navigation */}
 
         <div className="border-t border-white/10">
 
@@ -135,7 +139,7 @@ function Header() {
 
             <Link
               to="/products"
-              className="shrink-0 text-sm font-semibold text-white"
+              className="shrink-0 text-sm font-semibold text-white transition-colors hover:text-[#d97736]"
             >
               Shop All
             </Link>

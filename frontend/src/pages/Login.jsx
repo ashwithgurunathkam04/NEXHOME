@@ -1,41 +1,162 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import {
+  Link,
+  useNavigate,
+} from 'react-router-dom'
+
+import {
+  useState,
+} from 'react'
+
+import {
+  getProfile,
+  loginUser,
+} from '@/services/authService'
+
+import { useAuth } from '@/context/AuthContext'
 
 function Login() {
   const navigate = useNavigate()
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  })
+  const {
+    login,
+  } = useAuth()
 
-  const [error, setError] = useState('')
+  const [formData, setFormData] =
+    useState({
+      email: '',
+      password: '',
+    })
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
+  const [error, setError] =
+    useState('')
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }))
+  const [loading, setLoading] =
+    useState(false)
+
+  const handleChange = (
+    event,
+  ) => {
+    const {
+      name,
+      value,
+    } = event.target
+
+    setFormData(
+      (previous) => ({
+        ...previous,
+        [name]: value,
+      }),
+    )
   }
 
-  const handleSubmit = (event) => {
+  const getErrorMessage = (
+    error,
+  ) => {
+    const responseData =
+      error?.response?.data
+
+    if (!responseData) {
+      return 'Unable to sign in. Please try again.'
+    }
+
+    if (
+      typeof responseData ===
+      'string'
+    ) {
+      return responseData
+    }
+
+    if (
+      responseData.detail
+    ) {
+      return responseData.detail
+    }
+
+    const firstError =
+      Object.values(
+        responseData,
+      ).flat()[0]
+
+    if (firstError) {
+      return String(
+        firstError,
+      )
+    }
+
+    return 'Invalid email or password.'
+  }
+
+  const handleSubmit = async (
+    event,
+  ) => {
     event.preventDefault()
 
     setError('')
 
-    if (!formData.email || !formData.password) {
-      setError('Please enter your email and password.')
+    const trimmedEmail =
+      formData.email.trim()
+
+    if (
+      !trimmedEmail ||
+      !formData.password
+    ) {
+      setError(
+        'Please enter your email and password.',
+      )
+
       return
     }
 
-    /*
-      Authentication will be connected to Django later.
-      For now, this only validates the frontend form.
-    */
+    try {
+      setLoading(true)
 
-    navigate('/account')
+      const data =
+        await loginUser({
+          username:
+            trimmedEmail,
+          password:
+            formData.password,
+        })
+
+      if (
+        !data?.access ||
+        !data?.refresh
+      ) {
+        setError(
+          'Login succeeded but authentication tokens were not returned.',
+        )
+
+        return
+      }
+
+      localStorage.setItem(
+        'nexhome-access-token',
+        data.access,
+      )
+
+      localStorage.setItem(
+        'nexhome-refresh-token',
+        data.refresh,
+      )
+
+      const profile =
+        await getProfile()
+
+      login(profile)
+
+      navigate('/account')
+    } catch (error) {
+      console.error(
+        'Login failed:',
+        error,
+      )
+
+      setError(
+        getErrorMessage(error),
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -78,7 +199,9 @@ function Login() {
           </div>
 
           <form
-            onSubmit={handleSubmit}
+            onSubmit={
+              handleSubmit
+            }
             className="space-y-5"
           >
 
@@ -97,11 +220,16 @@ function Login() {
                 id="email"
                 name="email"
                 type="email"
-                value={formData.email}
-                onChange={handleChange}
+                value={
+                  formData.email
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="you@example.com"
                 autoComplete="email"
-                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                disabled={loading}
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 disabled:cursor-not-allowed disabled:opacity-60"
               />
 
             </div>
@@ -121,7 +249,8 @@ function Login() {
 
                 <button
                   type="button"
-                  className="text-sm font-medium text-brand-accent transition-colors hover:text-white"
+                  disabled={loading}
+                  className="text-sm font-medium text-brand-accent transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Forgot password?
                 </button>
@@ -132,11 +261,16 @@ function Login() {
                 id="password"
                 name="password"
                 type="password"
-                value={formData.password}
-                onChange={handleChange}
+                value={
+                  formData.password
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="Enter your password"
                 autoComplete="current-password"
-                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                disabled={loading}
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 disabled:cursor-not-allowed disabled:opacity-60"
               />
 
             </div>
@@ -153,9 +287,12 @@ function Login() {
 
             <button
               type="submit"
-              className="w-full rounded-lg bg-brand-accent px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
+              disabled={loading}
+              className="w-full rounded-lg bg-brand-accent px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Sign In
+              {loading
+                ? 'Signing in...'
+                : 'Sign In'}
             </button>
 
           </form>

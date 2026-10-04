@@ -6,122 +6,309 @@ import {
   useState,
 } from 'react'
 
+import {
+  addToCart as addProductToCart,
+  clearCart as clearCartFromServer,
+  deleteCartItem,
+  getCart,
+  updateCartItem,
+} from '@/services/cartService'
+
+import { useAuth } from '@/context/AuthContext'
+
 const CartContext = createContext(null)
 
 function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem('nexhome-cart')
+  const {
+    isAuthenticated,
+    loading: authLoading,
+  } = useAuth()
 
-    if (!savedCart) {
-      return []
-    }
+  const [cartItems, setCartItems] =
+    useState([])
 
-    try {
-      return JSON.parse(savedCart)
-    } catch {
-      return []
-    }
-  })
+  const [loading, setLoading] =
+    useState(false)
 
-  useEffect(() => {
-    localStorage.setItem(
-      'nexhome-cart',
-      JSON.stringify(cartItems)
-    )
-  }, [cartItems])
+  const [error, setError] =
+    useState('')
 
-  const addToCart = (product) => {
-    if (!product || product.stock <= 0) {
+  const loadCart = async () => {
+    if (!isAuthenticated) {
+      setCartItems([])
       return
     }
 
-    setCartItems((currentItems) => {
-      const existingItem = currentItems.find(
-        (item) => item.id === product.id
+    try {
+      setLoading(true)
+      setError('')
+
+      const cart = await getCart()
+
+      const items =
+        cart.items.map((item) => ({
+          ...item.product,
+          quantity: item.quantity,
+          cartItemId: item.id,
+        }))
+
+      setCartItems(items)
+    } catch (error) {
+      console.error(
+        'Failed to load cart:',
+        error,
       )
 
-      if (existingItem) {
-        if (existingItem.quantity >= product.stock) {
-          return currentItems
-        }
-
-        return currentItems.map((item) =>
-          item.id === product.id
-            ? {
-                ...item,
-                quantity: item.quantity + 1,
-              }
-            : item
-        )
-      }
-
-      return [
-        ...currentItems,
-        {
-          ...product,
-          quantity: 1,
-        },
-      ]
-    })
-  }
-
-  const increaseQuantity = (productId) => {
-    setCartItems((currentItems) =>
-      currentItems.map((item) => {
-        if (item.id !== productId) {
-          return item
-        }
-
-        if (item.quantity >= item.stock) {
-          return item
-        }
-
-        return {
-          ...item,
-          quantity: item.quantity + 1,
-        }
-      })
-    )
-  }
-
-  const decreaseQuantity = (productId) => {
-    setCartItems((currentItems) =>
-      currentItems
-        .map((item) =>
-          item.id === productId
-            ? {
-                ...item,
-                quantity: item.quantity - 1,
-              }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    )
-  }
-
-  const removeFromCart = (productId) => {
-    setCartItems((currentItems) =>
-      currentItems.filter(
-        (item) => item.id !== productId
+      setError(
+        'Unable to load your cart.',
       )
-    )
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const clearCart = () => {
-    setCartItems([])
+  useEffect(() => {
+    if (authLoading) {
+      return
+    }
+
+    loadCart()
+  }, [
+    isAuthenticated,
+    authLoading,
+  ])
+
+  const addToCart = async (
+    product,
+  ) => {
+    if (
+      !product ||
+      product.stock <= 0 ||
+      !isAuthenticated
+    ) {
+      return
+    }
+
+    try {
+      setError('')
+
+      const cart =
+        await addProductToCart(
+          product.id,
+          1,
+        )
+
+      const items =
+        cart.items.map((item) => ({
+          ...item.product,
+          quantity: item.quantity,
+          cartItemId: item.id,
+        }))
+
+      setCartItems(items)
+    } catch (error) {
+      console.error(
+        'Failed to add product to cart:',
+        error,
+      )
+
+      setError(
+        error.response?.data?.error ||
+        'Unable to add product to cart.',
+      )
+    }
+  }
+
+  const increaseQuantity = async (
+    productId,
+  ) => {
+    const item =
+      cartItems.find(
+        (cartItem) =>
+          cartItem.id === productId,
+      )
+
+    if (!item) {
+      return
+    }
+
+    if (
+      item.quantity >=
+      item.stock
+    ) {
+      return
+    }
+
+    try {
+      setError('')
+
+      const updatedItem =
+        await updateCartItem(
+          item.cartItemId,
+          item.quantity + 1,
+        )
+
+      setCartItems(
+        (currentItems) =>
+          currentItems.map(
+            (currentItem) =>
+              currentItem.id ===
+                productId
+                ? {
+                  ...currentItem,
+                  quantity:
+                    updatedItem.quantity,
+                }
+                : currentItem,
+          ),
+      )
+    } catch (error) {
+      console.error(
+        'Failed to increase cart quantity:',
+        error,
+      )
+
+      setError(
+        error.response?.data?.error ||
+        'Unable to update cart quantity.',
+      )
+    }
+  }
+
+  const decreaseQuantity = async (
+    productId,
+  ) => {
+    const item =
+      cartItems.find(
+        (cartItem) =>
+          cartItem.id === productId,
+      )
+
+    if (!item) {
+      return
+    }
+
+    if (item.quantity <= 1) {
+      return
+    }
+
+    try {
+      setError('')
+
+      const updatedItem =
+        await updateCartItem(
+          item.cartItemId,
+          item.quantity - 1,
+        )
+
+      setCartItems(
+        (currentItems) =>
+          currentItems.map(
+            (currentItem) =>
+              currentItem.id ===
+                productId
+                ? {
+                  ...currentItem,
+                  quantity:
+                    updatedItem.quantity,
+                }
+                : currentItem,
+          ),
+      )
+    } catch (error) {
+      console.error(
+        'Failed to decrease cart quantity:',
+        error,
+      )
+
+      setError(
+        error.response?.data?.error ||
+        'Unable to update cart quantity.',
+      )
+    }
+  }
+
+  const removeFromCart = async (
+    productId,
+  ) => {
+    const item =
+      cartItems.find(
+        (cartItem) =>
+          cartItem.id === productId,
+      )
+
+    if (!item) {
+      return
+    }
+
+    try {
+      setError('')
+
+      await deleteCartItem(
+        item.cartItemId,
+      )
+
+      setCartItems(
+        (currentItems) =>
+          currentItems.filter(
+            (currentItem) =>
+              currentItem.id !==
+              productId,
+          ),
+      )
+    } catch (error) {
+      console.error(
+        'Failed to remove cart item:',
+        error,
+      )
+
+      setError(
+        error.response?.data?.error ||
+        'Unable to remove cart item.',
+      )
+    }
+  }
+
+  const clearCart = async () => {
+    if (!isAuthenticated) {
+      setCartItems([])
+      return
+    }
+
+    try {
+      setError('')
+
+      await clearCartFromServer()
+
+      setCartItems([])
+    } catch (error) {
+      console.error(
+        'Failed to clear cart:',
+        error,
+      )
+
+      setError(
+        error.response?.data?.error ||
+        'Unable to clear cart.',
+      )
+    }
   }
 
   const cartCount = useMemo(() => {
     return cartItems.reduce(
-      (total, item) => total + item.quantity,
-      0
+      (total, item) =>
+        total + item.quantity,
+      0,
     )
   }, [cartItems])
 
   const cartSubtotal = useMemo(() => {
     return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
+      (total, item) =>
+        total +
+        item.price *
+        item.quantity,
+      0,
     )
   }, [cartItems])
 
@@ -129,26 +316,36 @@ function CartProvider({ children }) {
     cartItems,
     cartCount,
     cartSubtotal,
+
+    loading,
+    error,
+
     addToCart,
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
     clearCart,
+
+    refreshCart:
+      loadCart,
   }
 
   return (
-    <CartContext.Provider value={cartValue}>
+    <CartContext.Provider
+      value={cartValue}
+    >
       {children}
     </CartContext.Provider>
   )
 }
 
 export function useCart() {
-  const context = useContext(CartContext)
+  const context =
+    useContext(CartContext)
 
   if (!context) {
     throw new Error(
-      'useCart must be used inside a CartProvider'
+      'useCart must be used inside a CartProvider',
     )
   }
 

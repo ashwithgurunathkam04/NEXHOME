@@ -6,7 +6,9 @@ from .models import Order, OrderItem
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
+    product = ProductSerializer(
+        read_only=True,
+    )
 
     class Meta:
         model = OrderItem
@@ -31,6 +33,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "id",
             "address",
             "total_amount",
+            "delivery_charge",
             "status",
             "payment_status",
             "items",

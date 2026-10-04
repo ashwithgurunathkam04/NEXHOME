@@ -1,6 +1,80 @@
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+
+import {
+  getProfile,
+  logoutUser,
+} from '@/services/authService'
 
 function Account() {
+  const navigate = useNavigate()
+
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true)
+        setError('')
+
+        const data = await getProfile()
+
+        setProfile(data)
+      } catch (error) {
+        console.error(
+          'Failed to fetch profile:',
+          error,
+        )
+
+        setError(
+          'Unable to load your account information.',
+        )
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    const accessToken =
+      localStorage.getItem(
+        'nexhome-access-token',
+      )
+
+    if (accessToken) {
+      fetchProfile()
+    } else {
+      setLoading(false)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    logoutUser()
+
+    setProfile(null)
+
+    navigate('/login')
+  }
+
+  const fullName =
+    profile
+      ? [
+        profile.first_name,
+        profile.last_name,
+      ]
+        .filter(Boolean)
+        .join(' ') ||
+      profile.username ||
+      'User'
+      : 'Guest User'
+
+  const email =
+    profile?.email ||
+    'Not signed in'
+
+  const isAuthenticated =
+    Boolean(profile)
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
 
@@ -71,13 +145,16 @@ function Account() {
               <span>→</span>
             </Link>
 
-            <button
-              type="button"
-              className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-medium text-brand-accent transition-colors hover:bg-brand-accent/10"
-            >
-              <span>Sign Out</span>
-              <span>→</span>
-            </button>
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-medium text-brand-accent transition-colors hover:bg-brand-accent/10"
+              >
+                <span>Sign Out</span>
+                <span>→</span>
+              </button>
+            )}
 
           </nav>
 
@@ -96,7 +173,11 @@ function Account() {
             </p>
 
             <h2 className="mt-3 text-2xl font-semibold sm:text-3xl">
-              Your NEXHOME account
+              {loading
+                ? 'Loading your account...'
+                : isAuthenticated
+                  ? `Welcome, ${fullName}`
+                  : 'Your NEXHOME account'}
             </h2>
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/60">
@@ -210,7 +291,9 @@ function Account() {
                 </p>
 
                 <p className="mt-2 text-sm font-medium text-white">
-                  Guest User
+                  {loading
+                    ? 'Loading...'
+                    : fullName}
                 </p>
 
               </div>
@@ -222,51 +305,63 @@ function Account() {
                 </p>
 
                 <p className="mt-2 text-sm font-medium text-white">
-                  Not signed in
+                  {loading
+                    ? 'Loading...'
+                    : email}
                 </p>
 
               </div>
 
             </div>
 
+            {error && (
+              <p className="mt-5 rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                {error}
+              </p>
+            )}
+
           </div>
 
           {/* Authentication */}
 
-          <div className="rounded-2xl border border-border-strong bg-surface-soft p-6 sm:p-7">
+          {!isAuthenticated && !loading && (
 
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
-              Account Access
-            </p>
+            <div className="rounded-2xl border border-border-strong bg-surface-soft p-6 sm:p-7">
 
-            <h2 className="mt-2 text-xl font-semibold text-text-primary">
-              Not signed in?
-            </h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent">
+                Account Access
+              </p>
 
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary">
-              Sign in to access your personal account information and order
-              history.
-            </p>
+              <h2 className="mt-2 text-xl font-semibold text-text-primary">
+                Not signed in?
+              </h2>
 
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary">
+                Sign in to access your personal account information and order
+                history.
+              </p>
 
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center rounded-lg bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
-              >
-                Sign In
-              </Link>
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
 
-              <Link
-                to="/register"
-                className="inline-flex items-center justify-center rounded-lg border border-border-strong bg-white px-5 py-3 text-sm font-semibold text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
-              >
-                Create Account
-              </Link>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center rounded-lg bg-brand-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
+                >
+                  Sign In
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center rounded-lg border border-border-strong bg-white px-5 py-3 text-sm font-semibold text-text-primary transition-colors hover:border-brand-accent hover:text-brand-accent"
+                >
+                  Create Account
+                </Link>
+
+              </div>
 
             </div>
 
-          </div>
+          )}
 
         </div>
 

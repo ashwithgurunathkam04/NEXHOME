@@ -1,58 +1,172 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import {
+  Link,
+  useNavigate,
+} from 'react-router-dom'
+
+import {
+  useState,
+} from 'react'
+
+import {
+  registerUser,
+} from '@/services/authService'
 
 function Register() {
   const navigate = useNavigate()
 
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  })
+  const [formData, setFormData] =
+    useState({
+      fullName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    })
 
-  const [error, setError] = useState('')
+  const [error, setError] =
+    useState('')
+
+  const [loading, setLoading] =
+    useState(false)
 
   const handleChange = (event) => {
-    const { name, value } = event.target
+    const {
+      name,
+      value,
+    } = event.target
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }))
+    setFormData(
+      (previous) => ({
+        ...previous,
+        [name]: value,
+      }),
+    )
   }
 
-  const handleSubmit = (event) => {
+  const getErrorMessage = (
+    error,
+  ) => {
+    const responseData =
+      error?.response?.data
+
+    if (!responseData) {
+      return 'Unable to create your account. Please try again.'
+    }
+
+    if (
+      typeof responseData ===
+      'string'
+    ) {
+      return responseData
+    }
+
+    if (
+      responseData.detail
+    ) {
+      return responseData.detail
+    }
+
+    const firstError =
+      Object.values(
+        responseData,
+      ).flat()[0]
+
+    if (firstError) {
+      return String(
+        firstError,
+      )
+    }
+
+    return 'Unable to create your account. Please check your details and try again.'
+  }
+
+  const handleSubmit = async (
+    event,
+  ) => {
     event.preventDefault()
 
     setError('')
 
+    const trimmedFullName =
+      formData.fullName.trim()
+
+    const trimmedEmail =
+      formData.email.trim()
+
     if (
-      !formData.fullName ||
-      !formData.email ||
+      !trimmedFullName ||
+      !trimmedEmail ||
       !formData.password ||
       !formData.confirmPassword
     ) {
-      setError('Please fill in all the fields.')
+      setError(
+        'Please fill in all the fields.',
+      )
+
       return
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must contain at least 6 characters.')
+    if (
+      formData.password.length <
+      6
+    ) {
+      setError(
+        'Password must contain at least 6 characters.',
+      )
+
       return
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match.')
+    if (
+      formData.password !==
+      formData.confirmPassword
+    ) {
+      setError(
+        'Passwords do not match.',
+      )
+
       return
     }
 
-    /*
-      User registration will be connected to Django later.
-      For now, this only validates the frontend form.
-    */
+    const nameParts =
+      trimmedFullName.split(
+        /\s+/,
+      )
 
-    navigate('/login')
+    const firstName =
+      nameParts[0] || ''
+
+    const lastName =
+      nameParts
+        .slice(1)
+        .join(' ')
+
+    try {
+      setLoading(true)
+
+      await registerUser({
+        username: trimmedEmail,
+        email: trimmedEmail,
+        password:
+          formData.password,
+        first_name:
+          firstName,
+        last_name:
+          lastName,
+      })
+
+      navigate('/login')
+    } catch (error) {
+      console.error(
+        'Registration failed:',
+        error,
+      )
+
+      setError(
+        getErrorMessage(error),
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -95,7 +209,9 @@ function Register() {
           </div>
 
           <form
-            onSubmit={handleSubmit}
+            onSubmit={
+              handleSubmit
+            }
             className="space-y-5"
           >
 
@@ -114,11 +230,16 @@ function Register() {
                 id="fullName"
                 name="fullName"
                 type="text"
-                value={formData.fullName}
-                onChange={handleChange}
+                value={
+                  formData.fullName
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="Enter your full name"
                 autoComplete="name"
-                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                disabled={loading}
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 disabled:cursor-not-allowed disabled:opacity-60"
               />
 
             </div>
@@ -138,11 +259,16 @@ function Register() {
                 id="email"
                 name="email"
                 type="email"
-                value={formData.email}
-                onChange={handleChange}
+                value={
+                  formData.email
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="you@example.com"
                 autoComplete="email"
-                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                disabled={loading}
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 disabled:cursor-not-allowed disabled:opacity-60"
               />
 
             </div>
@@ -162,11 +288,16 @@ function Register() {
                 id="password"
                 name="password"
                 type="password"
-                value={formData.password}
-                onChange={handleChange}
+                value={
+                  formData.password
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="Create a password"
                 autoComplete="new-password"
-                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                disabled={loading}
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 disabled:cursor-not-allowed disabled:opacity-60"
               />
 
               <p className="mt-2 text-xs text-white/40">
@@ -190,11 +321,16 @@ function Register() {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
+                value={
+                  formData.confirmPassword
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="Enter your password again"
                 autoComplete="new-password"
-                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20"
+                disabled={loading}
+                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-[#263238] px-4 text-sm text-white placeholder:text-white/35 transition focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 disabled:cursor-not-allowed disabled:opacity-60"
               />
 
             </div>
@@ -211,9 +347,12 @@ function Register() {
 
             <button
               type="submit"
-              className="w-full rounded-lg bg-brand-accent px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark"
+              disabled={loading}
+              className="w-full rounded-lg bg-brand-accent px-5 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-accent-dark disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Create Account
+              {loading
+                ? 'Creating account...'
+                : 'Create Account'}
             </button>
 
           </form>
